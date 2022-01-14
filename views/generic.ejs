@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+  <title>Programmer Notes</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head>
+
+<body class="is-preload">
+
+  <!-- Wrapper -->
+  <div id="wrapper">
+
+    <!-- Main -->
+    <div id="main">
+      <div class="inner">
+
+        <!-- Header -->
+        <header id="header">
+          <a href="index.html" class="logo"><strong>Massiles Ghernaout</strong> | Notes</a>
+          <ul class="icons">
+            <li><a href="https://www.linkedin.com/in/massigy" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li>
+            <li><a href="https://www.github.com/MassiGy" class="icon brands fa-github"><span class="label">Github</span></a></li>
+          </ul>
+        </header>
+
+        <!-- Content -->
+        <section>
+          <header class="main">
+            <h1>Learn with <%= data.title %>  </h1>
+          </header>
+
+          <hr class="major" />
+          <p>
+            <%- data.content %>
+          </p>
+
+          <hr class="major" />
+          <ul class="actions">
+            <form action="/files/<%= data.title%>" method="post">
+              <li><button class="button">Get <%= data.title %> </button></li>
+            </form>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="inner">
+
+        <!-- Search -->
+        <section id="search" class="alt">
+          <form method="post" action="#">
+            <input type="text" name="query" id="query" placeholder="Search" />
+          </form>
+        </section>
+
+        <!-- Menu -->
+        <nav id="menu">
+          <header class="major">
+            <h2>Menu</h2>
+          </header>
+
+          <ul>
+            <li><a href="index.html">Homepage</a></li>
+            <li><a href="generic.html">Generic</a></li>
+            <li>
+              <span class="opener">Ressources</span>
+              <ul>
+                <% for(let file of files){ %> 
+                  <li><a href="/files/<%= file %> "><%= file %> </a></li>
+                  <% } %> 
+              </ul>
+
+
+        </nav>
+
+
+        <!-- Section -->
+        <section>
+          <header class="major">
+            <h2>Get in touch</h2>
+          </header>
+          <p>I am very glad that you are here, I' am a junior but very ambitious web developer, constantly learning to give you what you deserve... I am helping people to create anything from basic website to portfolios and even small web apps in order to make their business alive online and improve results.</p>
+          <ul class="contact">
+            <li class="icon solid fa-envelope"><a href="mailto:ghernaoutmassi@gmail.com">ghernaoutmassi@gmail.com</a></li>
+            <li class="icon solid fa-phone"><a href="tel:+33-7-66-62-19-51">(+33) 7 66 62 19 51</a></li>
+            <li class="icon solid fa-home">84 François Mazeline, <br />
+              76600 Le Havre, France
+            </li>
+          </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer id="footer">
+          <p class="copyright">&copy; Untitled. All rights reserved. Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+        </footer>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/browser.min.js"></script>
+  <script src="/assets/js/breakpoints.min.js"></script>
+  <script src="/assets/js/util.js"></script>
+  <script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>

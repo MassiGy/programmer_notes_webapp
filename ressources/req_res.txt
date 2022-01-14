@@ -1,0 +1,73 @@
+How the request response life cycle happens:
+
+to understand that let try to demestefy an exemple of that process.
+
+let imagine that we are googeling for "mongas"
+
+so our url will be like: "www.google.com/?search=mongas"
+
+so let break up this process into sub processes to understand what actually happens behind the scenes.
+
+
+First: when we hit enter after typing our url, the request will be set to open.
+
+Second: Your router will be notified by the fact that there is a an open request, then it will see the url of that request and will translate it into an address of the corresponding server.
+
+		"www.google.com/?search=mongas"
+			
+and it will break it down as it follows:
+	
+	domain_name=www.google.com
+	protocol=https
+	end_point=/?search=mongas
+
+and it will translate it to this
+	
+	server_address=407.255.125
+	protocol=443
+
+so the resault will be  : 407.255.125/443
+
+NOTE: the end_point header is not sent to the router, since this one is only responsible of finding the correct server. 
+NOTE: for this tepical process your router is addressing the dns server to translate human readable url into server addresses.
+
+
+Third: now, an connection is established between your browser and the server and  the request will be sent. For that, the request should have some shape to it, to fit the TCP, transmission control protocol, requesits.
+
+
+So the request should look like this :
+
+	REQUEST:
+		GET /?search=mongas HTTPS/1.1
+		
+		ACCEPTED_FORMAT : text/html/json
+		ACCEPTED_LANGUAGE: en-us	
+		
+		BODY : {
+		
+		}
+
+So this is what the server will receive.
+
+Fourth: now the server receives your request, so the responding process will begin. So it will creat a template of you response object
+
+so the response sould look like this 
+
+	RESPONSE:
+		HTTPS/1.1 200 "OK"
+		
+		FORMAT : json
+		LANGUAGE: en-us	
+		
+		BODY : {
+		
+		}
+
+and then it will start filling the response body, after the api will finish the route analytics and fetch the right data.
+
+
+Fiveth: now the response object is complete, the server will send it back to the browser
+
+Sixth: The browser will parse the received response and show it to the user.
+
+

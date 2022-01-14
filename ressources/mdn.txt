@@ -1,0 +1,63 @@
+
+
+in this text file we will continue our note in the mdn journey to web developement, we are currently in the section where we will learn how to create the basic express web app skelethon using the express application generator tool.
+
+So when you initialize an express web project with the express application generator, you will get a basic skelethon of your web app, and in this skelethon comes an mvc oriented structue and architecture, so you will have the views, routes, controllers, and public directories there,  and also you will have the bin directory which will contian the "www" file, which is basicly the end point that you API will expose to the end user. In this file, usually you will define the port where your server will be listening to requests from, and also you will require the app.js file which is like the config file of your app.
+
+Also in this file, you will see that express application generator had put into some boilerplate code which will basicly create a server with the node-http package, thus it will also install some dependenses by default, like the "node-http", "express", "cookie-parser"...
+
+Now you know how to create a basic website skelethon with the express application generator tool.
+
+You can learn more on the mdn docs about learning web developement/express/tutos.
+
+
+Now we need to learn how to connect an express based web app to a database, for progress ease we will take mongodb which plays well with node and also cuz it is the database that I know the most.
+
+So as we learned in our self-thought journey, to connect an application to a data base we need to do a couple of things:
+	1. we need to create a way of communication 
+	2. establish that communication or connection.
+	3. create a schema and modal to set up a flow to our dta
+	4. create collection and use the database.
+
+
+So the first step, is just the preparation phase in which will either install the mongodb driver or use the mongoose ODM (object data  mapper), to talk and interact with our db.
+
+I choosed the mongoose way, because this will let me focus on my express stuff and also this keeps me in the js object world which is much more familiar to me then mongodb documents.
+
+
+Then we need to establish the connection, mongoose makes it very easy for us, since you can do this in one line by typing:
+
+	mongoose.connect(${dbUrl}, ${option})
+
+eventually you will add some callbacks or await this thing if your application workflow highly depends on the db at the first time.
+
+
+
+
+Third, we need to create our modals, this step will define how the stored data should look like, it is basicly a mongoose schema instance and it looks very similar to a js object.
+
+With this implemented we can now export it as a module and then use it in our routes and controllers files.
+
+Also, with mongoose we can add plugins for our schemmas, image this like if we have a class and we add to it some methods, which is what it is basicly, and also most importantly we can add middelwares and do things if an event relative to that schemma or any instance of it was fired.
+
+But just before, exporting we need to convert this schema into a modal, which basicly like a blueprint and this modal is like a small function which will receive data and look if it matched its parent mongoose schemma.
+
+Finnaly we need to create our collections, and we can do that simply by using the exported modal to save some kind of data.
+
+
+So now if we go to our terminal, and we access our db by doing
+
+	$_mongo			// enter mongo shell
+	$_show dbs		// show local machine dbs
+	$_use myApp		// switch to myApp
+	$_show collection	// show your collection
+				// you will see your modal
+				// name in plural.
+
+	$_db.<collection_name>.find({})	// show all instances
+
+
+By doing so you fetched you db.
+
+
+

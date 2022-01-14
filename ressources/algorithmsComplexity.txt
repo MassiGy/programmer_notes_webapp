@@ -1,0 +1,26 @@
+Each algorithms is running on a machine, so each of them is taking up ressources form this particular machine, and the two biggest ressources that we have in the context of computation is space and time.
+
+So when we are talking about algorithms complexity we are meaning the time complexity and the space complexity of this algorithm.
+
+It turned out that computer scientist had found a notation for this, so called Big O notation and it represented with an italic big O, "O". and this notation is used both for the time and the space complexity but in the big contexts, that means that when we are mesuring the big O of an algorithm we are calculating the amount of time and ressources that this one will consumme if we had largest (maximum) input amount, and we are talking at the range of millions or billions of input. Whereas, when dealing with the minimal amount of input, computer scientist changed the Big O to the Big Omega, and this will gives us an overall idea of the efficienty of the algorithm at hand
+
+
+So, as a resault of using diffrent algorithms and calculating thier time and space complexity, we had discovered some patterns, or somme values of the so called big O notation, the most commun are O(n²), O(nlog(n)), O(n), O(log(n)), and finnaly O(1). And  they are sorted as they are listed above form the slowest O(n²) to the fastest O(1).
+
+And we take the same notation for Omega notation just by replacing O with Omega!
+
+
+
+Some notes:
+
+
+O(n+1) = O(n)		// O(n + const) = O(n)
+O(n² + n)  = O( n) 	// O(n² + const * n + const) = O (n²) 
+O(1000) = O(1)   	// O(constant) = O(1)
+
+
+* the idea is that we take the quentity that defines the limit of what is in the parentheses when n is approching infinity.
+
+
+
+

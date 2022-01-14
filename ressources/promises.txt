@@ -1,0 +1,53 @@
+
+
+In javascript, we were hundling asynchronous code via callbacks, and that lead us to the callback hell, which basicly refers to the fact that our code get very quickly very messy with callbacks.
+
+
+So in ES6, in 2015, javascript came with a new way of doing things, and that is promesises, which are here to get rid of the callback hell, and that by having a state that remaines in time.
+
+In other terms, promises are just response objects that are build and filled while the asynchrounous code is executing. It is a placeholder for a futur value, where the name promise came out.
+
+In the older way, if we want something to last in time waiting for something, we will chain on many callback just in order to gain time before the wanted resault is returned.
+
+But with promises we can fix this problem, and that because the promises gives us the opportunity to gain time, or in other words, wait for the fetched data to be returned then continue our tasks, and we can implement that with promises using the .then() method.
+
+
+So the problem was:
+
+	if a resquest is open
+		the request will take time
+		but we have tasks after it that depends on it.
+		
+	Before promises
+		We were gaining time for the request to be sent back
+		via the callback hell
+	
+	With promises 
+		We are not trying to gain time, cuz we can just wait 
+		until the promise is resolved and then continue the 			execution of our code via the .then() method
+	After promises
+		?
+		
+So after promises, in ES7-2016, async/await came along, and now we have a nicer way of doing things with the .then() method, and that by awaiting a promise opening task, and wait for it to be setteled (resolved or rejected), and then continue our code execution, but this is nicer because we no longer need to put the following code in the .then() method.
+
+
+So async/await makes our async code looks sync, but in fact it still async, and keep in mind that this is just syntactique sugar, it is implemented to make the developer job easier but everything works the same behind the scenes.
+
+
+NOTES:
+	Async function allways returns promises, so in order to 		retreive the returned data, you have to chain on the .then()  	method.
+	
+	You can create you promise via the Promise constructor function
+	this function takes a callback as an argument, and this 		callback is called the executioner function
+	It will be executed after the constructor function of the 		class is executed, and this function takes two arguments, the 	first one is the resolve function that will set the promise to 	resolved if called, that the second one is the reject function
+	which has the other way around behaviour.
+	
+	
+	
+	to run multiple promises at the same time, you can use the 		Promise.all() static method. Keep in mind that wherever you 		have multiple promises that need to be executed and are 		independent from each other, you have to use Promise.all(), 		and that in order to gain time and performance.
+	
+	
+	
+
+
+

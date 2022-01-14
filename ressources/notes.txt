@@ -1,0 +1,49 @@
+>>>>Learning Backend JS : 
+
+=>FACTS :
+
+/ASYNC KEYWORD : the async keyword is often set in a function declaration or expression to make this one an async function! The big diffrence between an async function and a normal one is that the first one retuns a promise resolved with some data and rejected with an error!, this keyword make the function itself a syncrenous javascript piece which means that it is processing a single line of code at time! this is why the async and the await keywords forms a pair!
+
+/AWAIT KEYWORD : the await keyword as mentionned before forms a pair with  the async keyword. But, whereas the async keyword is located in the function declaration or expression, in other words it is outside the function scope but it works inside it and impact it, the await keyword is located inside the function itself, in other words it is inside the function scope or syntaxs, its role is to await the following code till the current promise to be resolved and returns a value or a data as mentionned before, so this paire make the code single threaded which means that is processing with one line at time wich is very useful when making request while the following code is built to manipulate the request's result, and in the other part, with  this pair we are no longer in need to write tons of callback and nesting them each others to await the following cod; So it is making our code much cleaner, more flat and more enjoyable to read!
+
+/AJAJ : stands for Asyncrenous javascript and json, and it's reffering to the process of getting responses from a server using javascript!
+
+/JSON : stands for JavaScript Object Notation, and it's the format that the response will be returned after a request!
+
+/API  : stands for Applications Programming Interface, and it's a end point that companies expose to acces its servers and get data from it!
+
+/HEADERS : headers are a metadata, which is a data structred in top of an other one, let say that dataB is a header and it is built right in top of dataA, so the dataB is like refrence for the dataA, in other words; when getting a response to a request we usually search for headers to simplify the search for the main data which is the dataA in the previous analogy!; for exemple, when we search for a movie or any tv show we always look up for the title so in this analogy the title is the metadata and the show or the movie itself is the main data
+
+/Authentification: authentification is the process that tells us if a given user is the one that he is prettending to be, it also refers to the process getting the autenthique matter!
+/Authorization : authorization is the process that defiens us the list of tasks and manipulation that a given user can do when authentificated, (the user must be authentificated before the athorization process).
+/Hashing password : hashing is a process that we use to protect or hide something from another, like passwords, so when we recieve a password we pass it through a hashing function that will transform it to an unique output, and this output can match only the passed password; Also those hashing function are one-way function, that means that we can not reverse the i/o direction, in other words we can't go from the output and arrive to the corresponding input.
+/password Salts : password salts are some randomnly generated values that we merge with a given password before the hashing process, the idea behind password salts is to prevent hackers or anybody with maliscieuce attention to get the right password even if he create a process that hashes so many passwords and tries at each time to log in or to register! (those process are communly called passwords generators, or hit process).
+
+
+=>Methods and Functions :
+
+/JSON.parse(el) : this method is built to turn the Json format into a real js Object!, used communly to retrive the returned response and manipulate it with js code!; Usually used after a 'Get' resquest 
+{NOTE : a json format is stringefied by placing queotes around any peice of data, and it's containes the major party of js prams exept undefined and null 
+}
+
+/JSON.stringefy(el) : this method is built in order to turn a js object to a json format!; Used communly to return a js data into a json format to send it and change some information state or update it in a given server; Usually used befor a  'POST' request!
+
+{NOTE : those two methods right above are rarely used these days, instead we use axios librery which uses them by itself, and we are no longer in need to mentionn them in our code!
+}
+
+
+
+=>Rules :
+In the mongo world, or any other data base, we are always storing and saving data which we will propably use in the futur, so for a good use we have to structure our manner of keeping those data, so usually we have a parent element and child elements; So we have a couple of choises to do that :
+/One to few (embbeding the child elements in the parent one) : if we had a parent and few child, the most efficient way is to embed the child element directly in the parent one, in this case we can access both in one hit. As an analogy, we can imagin, a person with its houses adresses, it will be very unlikly that a person will have more then dozens of adresses, so in order to find those houses, we can juste find the person and ask him, same deal with data (in the same senarios of course)
+/One to many (embbeding a refrence of the child elements in the parent one) : if we had a parent and more then a dozen of child elements, the best way to save the relationship between the two is to have a refrence in the parent element refering to each child element, for exemple; let say the apple has announced a new lineup, and in it we have more then thirty products, so what's the best senario, is it the one when we have a websites for each product and in this one we refer to its lineup, or when we have a website for each lineup in which we will display all the availible products, After a moment we realize that the second way in the more appealing to us, because it is the most efficient, like that we will have less website to build and more content in our websites!.
+/One to bajillions (embbeding a refrence to the parent element in each child element) :imagin if we had a parent and more then a couple of child element let say more then a hundrend, one of the best ways is to store a refrence to the parent element in every child element proprities, so like that we can find the parent element through each child element. As an anlogy, imagin that we have a company with thousands of clients, in this case the most optimized way to save the relationship between the two parts is to make a mark in each clients that refers to that particular company, for exemple ; credit cards for banks...
+
+
+
+
+
+
+// To memorize
+
+_Heroku : 21102002massigyProjects

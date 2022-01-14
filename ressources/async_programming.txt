@@ -1,0 +1,17 @@
+Async programming deals with long running taskes in the background, in javascript, async js usually means the part of our codebase that is responsible of retreiving data from a db or writing to it, or pushing/uploading something from the net/cloud.
+
+In a more technical terms, asynchronous programming is a way of implementing code that runs in another time line then normal code, the sychronous one, and it is implemented in order to seperate the sychrounous code time line from the asychrounous code time line, and this is very useful since sychrounous code usually takes only some milliseconds, whereas asynchronous code can go high up until minutes.
+
+
+With that seperated time lines, we can write programmes or scripts with non-blocking code, since even if the aysnchronous part of it blocks the progress, cuz it takes more time, but the fact that is redirected in an other time line, the consequences are seamless, like imagine if a big truck in the road moves very slow, everyone will be borred down if they were behind it, or in the same way, but if trucks own thiers own way all the other cars will no longer car about them. Same story goas with sychronous and asychrounous code.
+
+NOTE: time line refers to even loops and you can imagin it as trivial branch in git 
+
+NOTE: in modules, server side files, we have the possiblity to use top level await, this means that we can use await outside an async function.
+
+This is very useful, but keep in mind that in modules asynchrounous javascript is not put in a seperated time line, so this will block you code until the promise is setteled(resolved or rejected).
+
+
+This is super useful in controllers implementation, since we use await and asynchrounous code to fetch data from the database and then see what we will do with it.
+
+
