@@ -9,6 +9,7 @@ const ejs_mate = require('ejs-mate');
 const fs = require("fs");
 const port = process.env.PORT || 8000;
 const multer = require("multer");
+const methodOverride = require("method-override");
 
 const storage_config = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,6 +20,10 @@ const storage_config = multer.diskStorage({
     }
 })
 
+// for multipart/form-data html5 forms
+// this will append to the req object the body and file(s) object
+// the body object will be filled as it was done by express.urlencoded method.
+// the file(s) object will be filled and parsed so as it contains the passed file(s)
 const upload = multer({ storage: storage_config })
 
 
@@ -30,7 +35,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use("/assets", express.static('assets'));
 app.use("/images", express.static('images'));
+// for normal html5 forms
 app.use(express.urlencoded({ extended: true }));
+// for hundling forms with http verbs diffrent then GET | POST.
+app.use(methodOverride("_method"))
 
 
 
@@ -73,9 +81,10 @@ app.get("/files/:file_name", (req, res) => {
     })
 })
 
+// I can change the upload view to a CMS like view, where I can upload update and delete files
 
-app.get("/upload", (req, res) => {
-    res.render("upload");
+app.get("/cms", (req, res) => {
+    res.render("cms");
 })
 
 function authenicate(req,res,next){
@@ -87,7 +96,12 @@ app.post("/files" ,upload.array("uploaded_files"),authenicate, (req, res) => {
     res.redirect("/");
 })
 
-
+app.delete("/files", (req,res)=> {
+    fs.unlink(`./ressources/${req.body.file_to_delete}`, function(err) {
+        if(err) return res.status(400).send(err.message);
+        res.redirect("/");
+    })
+})
 app.post("/files/:file_name", (req, res) => {
     res.download(path.join(__dirname, `./ressources/${req.params.file_name}`), `${req.params.file_name}`, function (err) {
         if (err) res.status(400).send(err.message);

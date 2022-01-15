@@ -37,14 +37,14 @@
         <!-- Content -->
         <section>
           <header class="main">
-            <h1>Upload From</h1>
+            <h1>  CMS Froms</h1>
           </header>
 
 
           <div class="row gtr-200">
           
 
-
+              <h2>Upload Form</h2>
               <form method="post" action="/files" enctype="multipart/form-data">
                 <div class="row gtr-uniform">
                   <div class="col-12">
@@ -52,9 +52,8 @@
                   </div>
                   <div class="col-12">
                     <input type="password" name="api_key"  id="demo-name" value="" placeholder="key" />
-                    <hr class="major" />
                   </div>
-                 
+                  
                   
                   <div class="col-12">
                     <ul class="actions">
@@ -63,8 +62,31 @@
                     </ul>
                   </div>
                 </div>
+                <hr class="major" />
               </form>
-
+              
+              <h2>Delete Form</h2>
+              <form method="post" action="/files?_method=DELETE">
+                <div class="row gtr-uniform">
+                  <div class="col-12">
+                    <input type="text" name="file_to_delete" multiple id="demo-name" value="" placeholder="txt file name" />
+                  </div>
+                  <div class="col-12">
+                    <input type="password" name="api_key"  id="demo-name" value="" placeholder="key" />
+                  </div>
+                  
+                  
+                  <div class="col-12">
+                    <ul class="actions">
+                      <li><input type="submit" value="Delete File(s)" class="primary" /></li>
+                      <li><input type="reset" value="Reset" /></li>
+                    </ul>
+                  </div>
+                </div>
+                <hr class="major" />
+              </form>
+              
+            
             </div>
 
         </section>
