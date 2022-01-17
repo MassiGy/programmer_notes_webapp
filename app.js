@@ -1,4 +1,4 @@
-if(process.NODE_ENV !="production"){
+if (process.NODE_ENV != "production") {
     require("dotenv").config()
 }
 
@@ -11,6 +11,12 @@ const port = process.env.PORT || 8000;
 const multer = require("multer");
 const methodOverride = require("method-override");
 
+// require redis config
+require("./config/redis");
+
+
+
+
 const storage_config = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, "./ressources")
@@ -18,7 +24,7 @@ const storage_config = multer.diskStorage({
     filename: function (req, file, cb) {
         cb(null, file.originalname)
     }
-})
+});
 
 // for multipart/form-data html5 forms
 // this will append to the req object the body and file(s) object
@@ -72,7 +78,7 @@ app.get("/files/:file_name", (req, res) => {
 
     fs.readFile(`./ressources/${file_name}`, "utf-8", (err, file_content) => {
         if (err) {
-            throw new Error(err.message);
+            return new Error(err.message);
         }
         let data = {}
         data.content = file_content.replace(/\n/g, "<br>")
@@ -81,30 +87,29 @@ app.get("/files/:file_name", (req, res) => {
     })
 })
 
-// I can change the upload view to a CMS like view, where I can upload update and delete files
 
 app.get("/cms", (req, res) => {
     res.render("cms");
 })
 
-function authenicate(req,res,next){
-   if(req.body.api_key===process.env.api_key) return next()
-   res.status(401).send("Unauthorized")
+function authenicate(req, res, next) {
+    if (req.body.api_key === process.env.api_key) return next()
+    res.status(401).send("Unauthorized")
 }
 
-app.post("/files" ,upload.array("uploaded_files"),authenicate, (req, res) => {
+app.post("/files", upload.array("uploaded_files"), authenicate, (req, res) => {
     res.redirect("/");
 })
 
-app.delete("/files", (req,res)=> {
-    fs.unlink(`./ressources/${req.body.file_to_delete}`, function(err) {
-        if(err) return res.status(400).send(err.message);
+app.delete("/files", authenicate,(req, res) => {
+    fs.unlink(`./ressources/${req.body.file_to_delete}`, function (err) {
+        if (err) return res.status(404).send("file not found");
         res.redirect("/");
     })
 })
 app.post("/files/:file_name", (req, res) => {
     res.download(path.join(__dirname, `./ressources/${req.params.file_name}`), `${req.params.file_name}`, function (err) {
-        if (err) res.status(400).send(err.message);
+        if (err) res.status(404).send("file not found");
     })
 })
 
@@ -131,7 +136,7 @@ app.post("/files/:file_name", (req, res) => {
 
 
 app.listen(port, (req, res) => {
-    console.log('server started');
+    console.log('server started on ' + port);
 })
 
 
