@@ -11,10 +11,6 @@ const port = process.env.PORT || 8000;
 const multer = require("multer");
 const methodOverride = require("method-override");
 
-// require redis config
-require("./config/redis");
-
-
 
 
 const storage_config = multer.diskStorage({
@@ -46,29 +42,18 @@ app.use(express.urlencoded({ extended: true }));
 // for hundling forms with http verbs diffrent then GET | POST.
 app.use(methodOverride("_method"))
 
-
+// import our cached data 
+const  {file_names,files} = require("./cache/files");
 
 app.use((req, res, next) => {
-    res.locals.files = fs.readdirSync("./ressources", (err, files) => {
-        if (err) throw new Error(err.message);
-        return files;
-    })
+    res.locals.file_names = file_names;
+    res.locals.files = files;
     next();
 })
 
 
 app.get("/", (req, res) => {
-    let data = [];
-    res.locals.files.forEach((file) => {
-        data.push({
-            file_name: file,
-            sample_text: fs.readFileSync(`./ressources/${file}`, "utf-8", function (err, file_content) {
-                if (err) res.status(400).send(err.message);
-                return file_content;
-            }).toString().substring(0, 100).concat("...")
-        })
-    })
-    res.render("index", { data });
+    res.render("index");
 })
 
 
@@ -92,6 +77,17 @@ app.get("/cms", (req, res) => {
     res.render("cms");
 })
 
+app.get("/files/search/:query", (req,res)=>{
+    const found_data = file_names.filter((name => name.includes(req.params.query)))
+    if(found_data) res.status(200).json(found_data);
+})
+
+app.post("/files/search", (req,res) => {
+    if(file_names.includes(req.body.query)) return res.redirect(`/files/${req.body.query}`)    
+    else res.status(404).send("File Not Found");
+})
+
+
 function authenicate(req, res, next) {
     if (req.body.api_key === process.env.api_key) return next()
     res.status(401).send("Unauthorized")
@@ -101,7 +97,7 @@ app.post("/files", upload.array("uploaded_files"), authenicate, (req, res) => {
     res.redirect("/");
 })
 
-app.delete("/files", authenicate,(req, res) => {
+app.delete("/files", authenicate, (req, res) => {
     fs.unlink(`./ressources/${req.body.file_to_delete}`, function (err) {
         if (err) return res.status(404).send("file not found");
         res.redirect("/");
@@ -112,8 +108,6 @@ app.post("/files/:file_name", (req, res) => {
         if (err) res.status(404).send("file not found");
     })
 })
-
-
 
 
 

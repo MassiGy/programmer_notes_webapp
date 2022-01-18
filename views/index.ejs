@@ -57,7 +57,7 @@
             <h2>My Programmer Notes</h2>
           </header>
           <div class="posts">
-            <% for (let file of data){ %>
+            <% for (let file of files){ %>
             <% console.log(file) %>
             <article>
               <!-- <a href="#" class="image"><img src="images/pic01.jpg" alt="" /></a> -->
@@ -81,9 +81,13 @@
       <div class="inner">
 
         <!-- Search -->
-        <section id="search" class="alt">
-          <form method="post" action="#">
-            <input type="text" name="query" id="query" placeholder="Search" />
+        <section  class="alt">
+          <form action="/files/search" method="post"  id="search">
+            <input type="text" name="query" id="query" placeholder="Search" list="file_suggestions" />
+            <datalist id="file_suggestions">
+            
+            </datalist>
+            
           </form>
         </section>
 
@@ -98,7 +102,7 @@
             <li>
               <span class="opener">Ressources</span>
               <ul>
-               <% for(let file of files){ %> 
+               <% for(let file of file_names){ %> 
                 <li><a href="/files/<%= file %> "><%= file %> </a></li>
                 <% } %> 
               </ul>
@@ -136,7 +140,10 @@
   <script src="assets/js/breakpoints.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
+  
 
+  <!-- custom scripts -->
+  <script defer src="assets/js/search_input.js"></script>
 </body>
 
 </html>

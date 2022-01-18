@@ -7,5 +7,5 @@ Tasks:
 3. Create contollers that will allow the user to download the notes (on a button click for exemple). (done)
 4. Create an admin route (secret route), where I can upload txt files to the server OS file system. (done)
 5. Create an implementation that will allow the admin to delete file. (done)
-6. Create a search engine with a full text search implementation using redis (caching principle).
-7. Create a stripe.js implementation that will allow generous users to send me some credit.
+6. Create a search engine with a full text search implementation using redis (caching principle). (redis-om is not well established yet)
+7. Create a stripe.js implementation that will allow generous users to send me some credit. (do this after launch)
