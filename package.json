@@ -8,15 +8,14 @@
     "helmet": "^5.0.1",
     "method-override": "^3.0.0",
     "multer": "^1.4.4",
-    "path": "^0.12.7",
-    "redis-om": "^0.1.7"
+    "path": "^0.12.7"
   },
-  "name": "bloggywebsite",
-  "description": "Editorial by HTML5 UP\r html5up.net | @ajlkn\r Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)",
+  "name": "programmer-notes",
+  "description": "a blog post type web app, where I can showcase my notes in my programming learning journey! ",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
