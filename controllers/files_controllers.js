@@ -11,7 +11,7 @@ module.exports.render_file_content =  (req, res) => {
     const { file_name } = req.params;
     fs.readFile(`./controllers/ressources/${file_name}`, "utf-8", (err, file_content) => {
         if (err) {
-            return new Error(err.message);
+            res.status(500).send("File Can Not Be Viewed");
         }
         let data = {}
         data.content = file_content.replace(/\n/g, "<br>")

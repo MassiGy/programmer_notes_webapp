@@ -9,6 +9,8 @@ const fs = require("fs");
 const ejs_mate = require('ejs-mate');
 const port = process.env.PORT || 8000;
 const methodOverride = require("method-override");
+const compression = require("compression");
+const helmet = require("helmet");
 
 
 // import our route hundlers
@@ -30,12 +32,16 @@ app.use("/images", express.static('images'));
 app.use(express.urlencoded({ extended: true }));
 // for hundling forms with http verbs diffrent then GET | POST.
 app.use(methodOverride("_method"))
+// for compressing our req/res cycles
+app.use(compression());
+// for security
+app.use(helmet());
 
 
 
 app.use((req, res, next) => {
     res.locals.file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
-        if (err) throw new Error(err.message);
+        if (err) res.status(500).send("Ressources can not be found!");
         return files;
     });
     res.locals.files = [];
@@ -46,7 +52,7 @@ app.use((req, res, next) => {
                 `./controllers/ressources/${file}`,
                 "utf-8",
                 function (err, file_content) {
-                    if (err) return "file content can not be accessed.";
+                    if (err) return "file content is empty or can not be accessed.";
                     return file_content;
                 }).toString().substring(0, 70).concat("...")
         })
@@ -60,8 +66,6 @@ app.use((req, res, next) => {
 app.use("/files", file_routes);
 app.use("/cms", cms_routes);
 app.use("/", other_routes);
-
-
 
 
 

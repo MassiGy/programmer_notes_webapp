@@ -1,0 +1,53 @@
+<div id="sidebar">
+    <div class="inner">
+
+      <!-- Search -->
+      <section  class="alt">
+        <form action="/files/search" method="post"  id="search">
+          <input type="text" name="query" id="query" placeholder="Search" list="file_suggestions" />
+          <datalist id="file_suggestions">
+          
+          </datalist>
+          
+        </form>
+      </section>
+
+      <!-- Menu -->
+      <nav id="menu">
+        <header class="major">
+          <h2>Menu</h2>
+        </header>
+        <ul>
+          <li><a href="/">Homepage</a></li>
+          <li>
+            <span class="opener">Ressources</span>
+            <ul>
+             <% for(let file of file_names){ %> 
+              <li><a href="/files/<%= file %> "><%= file %> </a></li>
+              <% } %> 
+            </ul>
+          </nav>
+
+    
+      <!-- Section -->
+      <section>
+        <header class="major">
+          <h2>Get in touch</h2>
+        </header>
+        <p>I am very glad that you are here, I' am a junior but very ambitious web developer, constantly learning to give you what you deserve... I am helping people to create anything from basic website to portfolios and even small web apps in order to make their business alive online and improve results.</p>
+        <ul class="contact">
+          <li class="icon solid fa-envelope"><a href="mailto:ghernaoutmassi@gmail.com">ghernaoutmassi@gmail.com</a></li>
+          <li class="icon solid fa-phone"><a href="tel:+33-7-66-62-19-51">(+33) 7 66 62 19 51</a></li>
+          <li class="icon solid fa-home">84 François Mazeline, <br />
+            76600 Le Havre, France
+        </li>
+        </ul>
+      </section>
+
+      <!-- Footer -->
+      <footer id="footer">
+        <p class="copyright">&copy; Untitled. All rights reserved. Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+      </footer>
+
+    </div>
+  </div>
