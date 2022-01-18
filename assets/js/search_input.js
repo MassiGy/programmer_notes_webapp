@@ -8,7 +8,7 @@ search_input.addEventListener("input", async function () {
         while (file_suggestions.firstChild) {
             file_suggestions.removeChild(file_suggestions.lastChild)
         }
-        const response = await fetch("/files/search/" + search_input.value);
+        const response = await fetch("/files/get_suggestions/" + search_input.value);
         const data = await response.json();
         data.forEach(element => {
 

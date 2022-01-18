@@ -1,0 +1,79 @@
+Back before in 2000 we used to develop our js based web app with a single giant javascript file, which will contain all the controllers and all the route hundlers and even our dom event listners.
+
+That was fine since our web app back then were small compared to the size of the present web apps.
+
+So that practice is not ideal for the current needs of the industry, so we developped a new way of developement and that by using a modern flow of structuring our code.
+
+
+This new way is all about archituchture, we call it the moduledriven developement, and as it sounds, all we do is to build modules that we will connect to each other in order to build more complex modules and finnaly our final resault.
+
+But what is actually a module?
+A module is a single file, that contains some specific code that is charged to do or process a certain task. So one module equal one file equal one functionnality. 
+
+To make this work, in the module, or in the module file, we create what we call the API, a public interface, which we will export to allow other files and third party modules to use.
+
+To understand this pattern image the API as the buttons of your calculator, they are all the thing shown to you, and they are the only thing that your can use to create some sort of interaction with the calculator engine, which will be the module.
+
+Also, modules can depend on other modules, so we need the use the Api of the those modules to make our module work, and thisis called the dependenceses importing.
+
+NOTE:
+To use a module, we need to export its API, and then importingin the module file where we want to use it.
+
+If we import a module, and it is not working until some dependeces are availible to it, we need to install those dependencesand import them befor the module itself so as they will be visible to it.
+
+
+How modules make js development better?
+Well the fact that modules exposes only certain public interface makes our code more self defencive, and that means that even if there is a bug somewhere our code can protect some of it parties, since the access permissions are not all positives.
+
+
+In the other hand, the fact the modules exposes only certain public interface makes our code more modular, since we can change our module behaviour and our entire project will  still work the same since the API is not changed.
+
+
+Also, modules are independent from our project, and they can be seen as bricks that we use to build a wall, we can use then in any project and we can copy them from one to another.
+
+
+
+How modules are used in the modern js developement process?
+
+Well in the modern js development we usually cut down our codebase into several folders and directories, this is call the architecture phase.
+
+We will take as exemple the MVC, modal view controller, pattern, in this way of doing things, we usually have one "app.js" file which will be the main server side file, in which we will import all the modules and use them to create our app flow
+
+Also, we will have a view directory, a controllers directory, and a modal directory, in the view directory we will have our templates, in the modal directory we will have our schemas that will define how are we talking to our database, but the most important in the controller directory we will have our modules that will decide how our users and the templates and the database will be interacting with each others.
+
+
+So that one way of using modules
+
+Another way, and it is the most important one, is through third party modules written by other developers, also know as npm packages, with this system we can include modules to introduce limitless functionnalities and features to our web apps.
+
+
+
+
+Besides the modules, what is new in the modern js developement?
+
+In modern developement, the end of the developement phase is not the final step befor deploying, it was back in time cuz we were deploying only one script file, but with modules our code is seperated into modules, so we need a way to reassemble those modules into a big file, this is super benefic since we deploy only one file to the server, and we can compress our code and also remove all the unused apis from our modules, with this process our web apps will lighter and faster!
+
+This process is done in the build process which is basicly composed of two steps, the bundling which is responsible of getting all the js code into one file and compressing it, then the transpiling and the polyfilling which is the step that will take our modern js code and turn it into ES5 js code so as older browsers will still able to understand our codebase.
+
+The resault of this process is a js file bundle that will contain all our server side implementation in one file, and we do that using bundeling modules like webpack or parcel.
+
+
+
+-----------------------------------------------------------
+NOTES:
+
+In modules the code is allways executed in strict mode
+In modules the global variables are scoped to the modules itself, and we cannot use them accross modules unless we export them.
+
+In modules the "this" pointer is pointing to undefined.
+In modules, when we import or export, we are not passing copies of the modules but we are passing the address of that modules in the envirenment memory.
+
+In modules, you should allways use module.exports to export you items, the reason is that when you are importing modules, you are in fact importing the address of the items in our env memory and this address is kept in the modules.exports feild. Whereas when you are using the exports keyword, this will not work because, because the exports refrence (stored address) can not be returned via the improting process at least that how things are implemented in nodejs.
+
+
+
+
+
+
+
+
