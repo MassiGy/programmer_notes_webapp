@@ -15,7 +15,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "sudo node app.js"
   },
   "keywords": [],
   "author": "",
