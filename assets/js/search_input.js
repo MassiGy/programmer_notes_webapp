@@ -5,8 +5,8 @@ const search_form = document.querySelector("#search");
 
 search_input.addEventListener("input", async function () {
     if (search_input.value.length > 0) {
-        while (file_suggestions.firstChild) {
-            file_suggestions.removeChild(file_suggestions.lastChild)
+        while (file_suggestions.lastElementChild) {
+            file_suggestions.removeChild(file_suggestions.lastElementChild);
         }
         const response = await fetch("/files/get_suggestions/" + search_input.value);
         const data = await response.json();
