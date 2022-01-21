@@ -1,0 +1,127 @@
+Javascirpt is one of the most famous languages out there and it is used majorly in web developpement.
+
+So javascript has its owns specifities, and we will enumerate the most important ones downs below
+
+1. Js is high level language, so we do not need to manually manage the runtime machine ressources.
+2. Js is a dynamic language, so we do not need to specefy the type of the variables that we are declaring, since everything is almost handeled via object and objects are refrenced by pointers, so an address does not need to know where it is pointing at, it only needs to be sure that the location that is pointing to exists in memory, and since this fact is true, pointing to an int or a string for js is the same thing, that's why we call it dynamic.
+
+3. Js has a garbage collector implementation, so basicly js runtime has an algorithm that tracks out the user uses of memory and frees (disposes) all the not used variables or objects.
+
+
+4. Js is single threaded programming language, that means that js runtime can only do one specific task at a time, and this is similar accross all scripting languages, since those interprets your code line by line and executing on the go. But this means also that js can not be so efficient for large computing tasks, and for those tasks we tend to use go or C++ or .Net with C#.
+
+5. Js has a non blocking event loop, this means that if we have to deal with an asynchronous job, js will not stay on it and wait for the promise to be resolved or rejected, instead it will make this process as a background process in the same cpu thread and continue interpreting the other non ansychronous (sychronous) lines of code. So even if js is a single threaded language, it still can handel multiple tasks in one go with this non blocking event loop modal implementation.
+
+
+6. Js is a multiparadigm language, so you can structure your code in diffrent ways, you can do that in the procedural way or the oop ways or even in the functionnal way.
+
+
+7. Js function are first call citizens, which means that function can be treated as variables, so we can pass functions to varibales or other functions, and also we can return function within other functions and this is very powerful. This is logic if you think about it, because functions are object type, so when we are writing down the name of a function we are basicly writing the address of it in memory so it is the same thing as other object and variables since js is a dynamic language.
+
+
+8. Js is an object based language this means that almost everything is an object in js, so almost everything is a pointer.
+
+
+---------------------------------------------------------------------
+
+Some notes about the this keyword:
+
+In javascript and like many other object based programming languages, we have this conscept of a pointer that points to the current execution context. In phyton we call it self, and in C++ it is also this, and in Ruby it is called self.
+
+But if we want to do this in like the procedural way, like in C programming language, all we need to do is to get the address of the current execution context, for exemple the current function memory address and then set it as its this keyword, that we can use inside the function itself.
+
+
+Back to Js, the this keyword has a diffrent behaviour when it comes to regular function and arrow functions.
+
+In regular functions, the this keyword is set to the execution context that is calling the function
+
+In arrow function, the this will be not changed, so it will be the function parrent this keyword, so it will be actually equal to the arrow function grand parent address in memory.
+
+
+Keep in mind also that in a regular function call of type : funcName();  the this keyword is set to undefined.
+
+
+
+----------------------------------------------------------------------
+
+What is the js runtime?
+
+In the web browser context the js runtime is basicly the envirenement where your code is evaluated and executed, it containes two types of memory called the call stack, which is a part of the computer stack memory, and also it has a heap part, which is also a part of the main computer memory, remember from the stanford programming paradigms courses, that every program running in a machine has a peice of the main memory that is given to it via the os memory manager unit.
+
+
+
+Also a runtime will include what we call the processes queue, which is basicly a linkedlist that links between the processes that need to be injected to the cpu or stored in the memory.
+
+
+Finnaly the js runtime, will have in the browser context another sub implementation which is called the browser apis, which are some services that the browser offers to the users to use and take benefit form them. It includes the Date api, Fetch Api, Https Apis and much more...
+
+In the server side runtime context like nodejs, we do not have the browser apis but we have some C++ bidings and extentions that helps us to do the same thing.
+
+----------------------------------------------------------------------
+
+Refrence types vs primitve types in js.
+
+
+The primitive types in js are basicly: number, string, boolean, null, undefined, symbols, bigint.
+
+the refrence types are the object based data types like: arrays, functions, objects.
+
+
+The diffrence between them is that the primitive types are stored in the stack, which means that they are indexed with the stack pointer.
+
+
+And the refrence types, are stored in the heap but thier refrences, memory location address, are stored in the stack. So when we are indexing or quereying an object based data type we are telling js to go to the stack and read the stored address and then find it in the stack.
+
+So basicly when we are declaring an object in js like this:
+
+	let car = {name : "bmw", speed: 120};
+	     ^			^
+	     |			|
+	     this is a 	this is an object instence that will
+	     label stored	be stored in the heap.
+	     in the stack
+	     which referse to
+	     the  address 
+	     of the object instence
+	     in the heap.
+	     		
+	
+
+
+
+     so if we do this
+     
+     	let ev = car;
+     	
+what we are actually doing is that we are creating a new label in the stack called ev that stores the same value of the label car availible in the stack, and since the car label stores an address to the object content above, the ev will be also storing it address
+
+So now, basicly we have two pointers to the same object, and that why when we change ev content we are also changing the car object.
+
+
+
+
+Another thing that is very intressting it that when we have this senario
+
+	const plane = {name: "boing", price: "10B"};
+	
+this is a const declaration, but the const keyword means that the address that is stored in the stack under the label named "plane" should be constant, so in no way this means that the object content should remain the same.
+
+and that is why when we do this, we get no error:
+
+
+	plane.name = "vyper jet";
+	
+but if we do this, we will get an error
+
+	plane  = {};
+	
+because now where are trying to change the address stored in the stack under the label named "plane";
+
+
+
+
+
+
+
+
+

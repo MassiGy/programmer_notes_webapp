@@ -1,0 +1,87 @@
+There is queit a few number of data types!. Here we will be focused to the ones that we can find in older programming languages like C, and then we will add the newer ones, just like those that comes in Javascript.
+C comes in with various built-in data types, and also it allows us to create our custom data types with the "typedef" method which is implemented in the language by default.
+Let start with the numbers:
+	int: stands for integers and it is stored in container of 32bit, so we can have 2 to the power of 32 numbers to represent. The first computer scientist were agreed to cut this number of possibilities to half, in order to have the same number of negative and positive integers, so in short instead of gowing form 0 to the number 2 to the power of 32 minus 1, we go form 0 to 2 to the power of 31 minus one, and also we can go all the way around form -1 to minus 2 to the power of 31. Like this we will end up with 2 to the power of 31  positive digits( because we are counting form 0) and the same for the negative ones. It is very important to keep in mind that integers take up 4kilo bytes of memory!.
+	long: stands for longint and it is just like an integer but with a larger range! So it takes up more memory two!
+	short: stands for shortint and it is a smaller version of an integer data type.
+	float: stands for real number, or numbers with a fractionnal part and a decimal one. This is super useful in case of dealing with devision related problems or something that cannot be handled with just an int like data type numbers. It is called float as a short for float point which represent the standard way or the notation used to interact with real numbers in the computer world, and the idea that we can place the point between the decimal and the fractionnal part dependently with the number that we want to represent. This gives us the ability to manage more efficiently the allocated space and also represend more number in that given size. For an exemple if we want to represent the number 300000000000.23, we will eventually place the float point further to the right and prioritize the fractionnal part above the decimal one, but if we want, with the same size of memory, to represent the number 3.14242322247439423, we will in this case place the point further to the left and focus more in the decimal part representation rather!. So in the end the idea is the make the point between the decimal and the fractionnal part of the real number a movable instead of a fixed one, which will lead us to worse memory management and less representation capabilities§
+	doubles: this is the same story between int and long, so double it is just a bigger set for a float and it is so called double because with this data type we can represent a real number with a doubled precision then what float can offers us!
+Moving on to letters:
+	char: it represents a letter or a characters
+	string: which is a ended sequence of characters, words, statments, paragraphs...
+		
+Logical types:
+	boolean: it can only be true of false, which translates to 1 or 0 respectively.
+	null: which is the nothing representation.
+	undefined: which is the representation of an unknown thing, it's there but no one knows what is it.
+	NaN: NaN stands for Nan a Number, which is used often in order to check if something is a number or not, and keep in mind that NaN is never equal to NaN, and if we think about it is super obvious, imagine for example that you have a string which is a NaN and a boolean which is a NaN, and even so they can not be equal. To understand better NaN is a concept not a value!
+	void: which is set to imperatively set the returned value to undefined. this is helpful to track your input/output in larger programes and also to use less space.
+
+	
+Some Important Notes:
+
+
+*Programming languages can be seperated to diffrent classes, now we will be intressting to two of them, imperativ & OOP programming languages.
+
+C is an imperativ programming language which means that every instance or entety is a command, it is like orders that we give to the machine, whereas in java or javacript which are OOP programming languages, every instance in it is an object containing it methods, it specific caractiristics in short.
+
+for an exemple: 
+in C to print some thing we say print("that thing");
+but in JS we rather do: console.log("that thing");
+
+So in JS we immediatly recognize the object notation with the dot '.' presence unlike C.
+
+
+
+*In low level programming lunguages, when dealing with strings we use double quoats "", and single ones '' with chars.
+
+
+*In low level programming lunguages, besides the data types mentionned above, we can use compound ones in order to get a more efficient use case of the memory space alocated to that specific data type.
+
+For exemple if we had to deal with an integer number, (no decimal part), and we know that this number can not pass the  4Billions, but it can not be negativ!
+
+So instead of changing the data type from int to long, cuz int range is form -2billions to 2 billions, and long is from -4billions to 4 billions, we can just specify to the compiler that we know that the number will be positif so just delete the negativ side of an integer and add it to the positiv side, so at the end our new version of the integer will start form the value 0 all the way up to 4 billions, so like this we saved the negativ 4 billons of the long data type ( if we decided to change the data type).
+
+And we can do that by adding the keyword "unsigned" in front of the type keyword in the variable declaration process.
+
+So at firt we had:
+
+int number;
+
+So instead of changing to this 
+
+long number;
+
+we can do better by saying:
+
+unsigned int number;
+
+and that's it.
+
+
+
+*Techniclly "String" data type does not exist on it own, it much like a compound one.
+The strings are represented with a more premitive data type which is chars, and a data structure which is an array.
+So a string in reality, is just an array of chars, that's why we can access diffrent characters within it by indexing just like any other array.
+But the more intressting part, is that in imperativ languages like C, in order to access an array, we have to know its lenght, unlike object oriented programming lungauges like java or javascript, the lenght of the array is not stored by default in the object containing the array that we are manipulating.
+So in C, we have to know the lenght before dealing with any sort of an array.
+But as it turened out, when dealing with string we do not need to, even if the string as sayed above are just plain char arrays!
+So... What's happening?
+
+We have to understand that strings are designed a littel bit diffrent that we meight think.
+A string of n characters, is not just an array of n places and n placeholders of char type. A string of n characters is represented with an array of n+1 place, the first n ones are filled with the given characters at the declaration processing, but the n+1 nth one is filled by a special character which is '\0' , this is the character used to describe logical "null" according to the ASCII chart. 
+
+So when a function like printf() is executed with a string as an arguments, it will walk through this one and only stops when the character '\0' was found, and this one will not be displayed!
+
+
+So this is how C can figure out the lenght of a string under the hood unlike any other array!
+
+
+
+
+
+
+
+
+
+

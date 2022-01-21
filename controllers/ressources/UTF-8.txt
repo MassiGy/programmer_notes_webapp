@@ -1,0 +1,80 @@
+
+------------------------------------------------------------------------
+Now that we've seen how integers and fractionnal numbers are represented, we can ask ourselves, how about the characthers of our own languages, or all the diffrents languages out there, how these are represented in binary and lied out in memory?
+
+
+
+So, in the past when computers were just used to perfrom military tasks and reports sending in the US, the ASCII representation shemma was created, but this was fine for the english users only, and even for them, they were restricted to use just the alphabit characters, and the ponctuation marks, this means that there is no emojis or what so ever!
+
+
+
+In the millitary feild, this was fine, everything needed is reached, but after the arrival of the web 1.0, designed by some scientifics to make the documents transfer simpler and accessible for everyone connected, we suddenly found ourselves in need to create another schemma for various reasons, muli-languages support, wider set of symboles to represent and more...
+
+
+For that we created in first, the ASCII extended, that as it sounds basicly extends the support capability of the ASCII chart, and addded to it the accented characters oftenly used in the europeen languages, like french.
+
+
+Then, in 2008, UTF-8 is officially standard, and supports up to 100 languages, and gives the computing world the power to map character from one up to four bytes. Also, one of the most important aspects of this innovation is that it is backward compatible with ASCII EXTENDED and ASCII at the same time, so that all the programes written before the UTF-8 arrival still able to read UTF-8 text since its characters are token from the ASCII chart. 
+
+
+
+
+---------------------------------------------------------------------
+Notes: UTF-8 came after UTF-32, which uses 4 bytes for every characters, the diffrence between them is that UTF-32, uses the same number of bits to represend every character even if it is an ASCII character which only needs 8 bits, so the UTF-8 is a compressed version, and it is equiped with some sort of algorithm to compute diffrently a charachter from another, to unerstand how it works, keep reading.
+
+
+Notes: no need the keep ASCII EXTENDED and ASCII representation shemma in mind, all you need to do is to master the UTF-8 encoding algorithm and you will be done with ASCII, and ASCII extended.
+----------------------------------------------------------------------
+
+
+So how this UTF-8 works?
+
+The idea behind it it to represend all the characters from the availible 100 languages around the globe, and also eliminate the UTF-32 problem that is to represent all the characters out there with the same number of bytes and bits.
+
+
+So the solution that was implemented, is basicly lay down all the characters that we need to represent, starting from the ASCII and the ASCII extended character to keep this backword compability, and then devid this massiv chart into section, so that for each section a specific number of bytes are allocated to represend this section symboles.
+
+
+So we ended up with some thing like this.
+
+
+
+		 Code point <-> UTF-8 conversion
+		 
+begin	end		byte1		byte2		byte3		byte4
+
+U+0000	U+007F		0xxxxxxx	------		------		-------
+(ASCII characters)	^
+				
+U+0080	U+07FF		110xxxxx	10xxxxxx	------		-------
+(ASCII etended )	^^^		^
+						
+			number of bytes = number of ones before the first 0.
+			(for ASCII, it is implemend way befor UTF-8, that why we 
+			do not haw 10 at the begining), and the up comming bytes 
+			all starts with 10 to mark a continuation.
+			
+U+0800	U+FFFF		1110xxxx	10xxxxxx	10xxxxxx	--------
+
+U+10000 U+10FFFF	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+
+
+
+
+
+
+
+
+
+
+
+Encoding steps: 
+
+1. Find the symbole in the UTF-8 chart
+2. Find it postition U+xxxxx;
+3. Find the binary equivalent of it position.
+4. Find the number of bytes needed with the protocal above.
+5. Fill the gaps, ('x'es) 
+
+
+

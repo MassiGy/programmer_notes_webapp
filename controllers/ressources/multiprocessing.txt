@@ -1,0 +1,35 @@
+How can we define the multiprocessing behaviour?
+
+First, we need to know what is multiprocessing, it is basicly the ability of running several processes at a given time, even if we have one processor and one central memory.
+
+How is that possible?,
+
+Well, in the processor view, multiporcessing means that the processor is executing, let say 3 processes, at a given time, but in the real world, what happens is that the processor is jumping back and forth from one process to another, so basicly it executes some instruction in the porcess number 1, then it goes and executes some instructions in the process number 2, and the it goes and executes some instructions in the prcess number 3, and it keep doing this until all processes are done.
+
+So in reality, multiprocessing is not possible, but we assume that it is, because the processors are able to switch back and forth so rapidly that we don't notice any diffrence!
+
+
+Meanwhile, in the memory view, multiprocessing means that we need to devide that physical memory into chunks that fits all the processes needs, and also we need to make sure that no process is touching to the memory chunk of another porcess.
+
+To do that, the operating system will basicly give all the processes a sub set of the physical memory, and let the porcess think that it owns it, and it will act just like if it is the main memory. So it well afford that the operating system gave him some sort of virtual memory which is as the physical memory devided to segments, like the stack, the heap, the code and the data segment, and this in order to not interrupt the process execution cycle.
+
+Then the operating, system will translate the behaviour of the process towards the vertual memory that it owns, into some sort of a similar behavior but with the physical memory this time, in other words, it will map the interaction of the porcess with it vertual memory to some interation with the same process with the main memory.
+
+
+To do that, the os is calling a unit called memory manager, and it will do the maping transaction, to make it simple, we can think that this memory manager it like a function that takes to arguments, the first one which will be the process id, and the second one the address of the virtual memory that this process is trying to access or with which it is interacting with, and then map this vertual address into a real address in the main memory, so with this logic set, we can afford to run multiple processes in one time, because we have the ability to equaly devid the memory and also our processor is fast enough to create this illusion that these processes are running at the same time, and that by jumbing back and forth from one to another until all of them are done!
+
+
+
+
+
+
+
+
+ressource: https://www.youtube.com/watch?v=TRfbJIsDBIM&list=PL9D558D49CA734A02&index=14
+
+
+
+
+
+
+

@@ -1,0 +1,31 @@
+in the coding world, all we do is problem solving, but even so this behaviour is not so commun and well known.
+
+
+So in this notes we will explain how to solve most of our coding problems. For that we will create a simple to do list that we will be refrencing back in front of a problem.
+
+
+
+These steps are essentially : 
+
+1. Understading deeply the problem:
+	- Take a bigger overview picture
+	- Ask pricise and consice questions
+	- see the current output, and compare it to the wanted output
+	- tweaks some thing up,
+	- go from generic to specific, by trying your code with number..
+
+2. Break down the problem into small problems, devide and conquer:
+	- isolate sub problems that can be fixed independently
+	- fix one sub problem at the time
+	- try to link the problems
+	- assebling and tweaking to get the final solution.
+	
+	
+For the second step we can use some principles that will help us to gain time and word efficiently.
+
+we can write pseudo code, english like code to get the logic layed down and not worry to much about the syntax (very helpful in low level programming);
+
+we can use abstraction, and that by supposing that some sub problems are already solved or comming up with some function and procedures that does what we want but that are not implemented yet, like for exemple if we have a big problem and inside of it we need to calculate the max value inside of an array, we can abstract this and use a function name maxFromArray() even if it does not exist yet.
+
+
+and also we can use online ressources to see what other developers did and tried and contribute into the open source community.
