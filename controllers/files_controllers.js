@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require('path');
+const { argv } = require("process");
 
 
 
@@ -9,7 +10,7 @@ module.exports.render_file_samples = (req, res) => {
 
 module.exports.render_file_content = (req, res) => {
     const { file_name } = req.params;
-    fs.readFileSync(`./controllers/ressources/${file_name}`, "utf-8", (err, file_content) => {
+    fs.readFile(`./controllers/ressources/${file_name}`, "utf-8", (err, file_content) => {
         if (err) {
             res.status(500).send("File Can Not Be Viewed.");
         }
@@ -28,7 +29,7 @@ module.exports.get_search_suggestion = (req, res) => {
 
 
 module.exports.send_search_resault = (req, res) => {
-    if (res.locals.file_names.includes(req.body.query)) return res.redirect(`/files/${req.body.query}`)
+    if (res.locals.file_names.includes(req.body.query.toString())) return res.redirect(`/files/${req.body.query}`)
     else res.status(404).send("File Not Found");
 };
 
