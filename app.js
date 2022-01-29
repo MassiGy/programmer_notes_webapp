@@ -40,11 +40,15 @@ app.use(helmet());
 
 
 app.use((req, res, next) => {
+    // find all the file names
     res.locals.file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
         if (err) res.status(500).send("Ressources can not be found!");
         return files;
     });
+    // Delete the Guide file to not be rendred twice (look to the view)
+    res.locals.file_names.splice(res.locals.file_names.indexOf("Guide.txt"),1);
     res.locals.files = [];
+
     res.locals.file_names.forEach((file) => {
         res.locals.files.push({
             file_name: file,
