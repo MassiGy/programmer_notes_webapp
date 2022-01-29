@@ -8,8 +8,10 @@ search_input.addEventListener("input", async function () {
         while (file_suggestions.lastElementChild) {
             file_suggestions.removeChild(file_suggestions.lastElementChild);
         }
+        console.log(file_suggestions);
         const response = await fetch("/files/get_suggestions/" + search_input.value);
         const data = await response.json();
+        console.log(data)
         data.forEach(element => {
 
             let new_sugges = document.createElement("option")

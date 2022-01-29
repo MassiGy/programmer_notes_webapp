@@ -9,6 +9,7 @@ router.get("/:file_name", file_controllers.render_file_content);
 router.get("/get_suggestions/:query", file_controllers.get_search_suggestion);
 
 router.post("/", upload.array("uploaded_files"),authenicate, file_controllers.upload_file);
+router.post("/search", file_controllers.send_search_resault)
 router.post("/:file_name", file_controllers.download_file)
 
 

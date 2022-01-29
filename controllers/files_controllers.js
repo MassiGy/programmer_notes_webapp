@@ -12,9 +12,9 @@ module.exports.render_file_content = (req, res) => {
     const { file_name } = req.params;
     fs.readFile(`./controllers/ressources/${file_name}`, "utf-8", (err, file_content) => {
         if (err) {
-            res.status(500).send("File Can Not Be Viewed.");
+           return res.status(500).send("File Can Not Be Viewed.");
         }
-        if (!file_content) res.status(404).send("File Can Not Be Viewed.")
+        if (!file_content) return res.status(404).send("File Can Not Be Viewed.")
         let data = {}
         data.content = file_content.replace(/\n/g, "<br>")
         data.title = req.params.file_name;
@@ -24,7 +24,8 @@ module.exports.render_file_content = (req, res) => {
 
 module.exports.get_search_suggestion = (req, res) => {
     const found_data = res.locals.file_names.filter((name => name.includes(req.params.query)))
-    if (found_data) res.status(200).json(found_data);
+    console.log(found_data);
+    if (found_data) res.status(200).send(found_data);
 };
 
 
