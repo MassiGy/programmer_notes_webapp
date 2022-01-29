@@ -1,5 +1,5 @@
 
-------------------------------------------------------------------------
+
 Now that we've seen how integers and fractionnal numbers are represented, we can ask ourselves, how about the characthers of our own languages, or all the diffrents languages out there, how these are represented in binary and lied out in memory?
 
 
