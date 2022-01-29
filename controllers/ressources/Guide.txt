@@ -1,0 +1,10 @@
+Hey there, I am Massiles Ghernaout, and I am the creator of this web application that is ment to help you guys in your software developement learning journey!
+This txt file is a littel bit special since it is here not to teach you something but to show you how you can better use the other ressources along side this file to learn.
+
+So quick notes:
+    1. The txt files are written by me while taking courses, so there will be typos and there will be a lot.
+    2. These notes are fruit of my personal understanding towards the topics at hand, and since I am a self-thought it can be there some miss-understading stand points.
+    3. These notes are here more to teach you the idea behind some concepts rather then taking you to the mastery point.
+    4. I took those notes with a text editor, and sometimes I drawed shapes in a janky way and can not be rendred as intended in the browser if so just download the file and view it with a text editor like gedit (this is the one that I've used).
+    5. There is a way to contact me through out the information given in the sidebar menu if needed to.
+    6. Finnaly, we are all software developers, the most important thing is that you enjoy learning. See yaa!
