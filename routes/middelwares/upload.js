@@ -3,10 +3,10 @@ const multer = require("multer");
 
 const storage_config = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "./controllers/ressources")
+        cb(null, "./controllers/ressources");
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname)
+        cb(null, file.originalname);
     }
 });
 
