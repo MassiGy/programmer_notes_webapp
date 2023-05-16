@@ -1,0 +1,406 @@
+# Let's learn about multithreading. ( Should be read after the multiprocessing.md )
+
+## Ressources:
+
+-   [Youtube playlist.](https://youtu.be/FY9livorrJI)
+-   Standford CS107 \| Programming paradigms.
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Introduction.
+
+Back in the early days of computation, most microprocessors were single
+core chips. As a consequence of that, only one process is running at the
+time. Then a couple of years later, that problem was solved by creating
+multicore processors. The overall experience was much smother and
+usable. But there was still another drawback, which was about how to do
+multiple things within one process.
+
+Since microprocessor are rughly limited on their cores count, we needed
+another strategy to do more with the same chips. That was motivated by
+the cost of hardcore engineering and also the overall cost of chips
+money-wise and energy/electricity-wise.
+
+Eventually, computer scientist & engineers came with a software based
+solution, and that was multithreading. The concept is simple, within a
+process we have a set of tasks, some of them are idenpendent and not
+generating important output for the following tasks. These tasks can be
+executed along side each other to gain performance and overall execution
+effeciency.
+
+The vision is to add a load balancer to the OS-kernel that monitors the
+threads of executions on the cpu. When a process is being exectued, this
+means that its threads are actualy dealt with. So the load balancer has
+to make sure that every thread is not overloading the cpu and also not
+kept aside.
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## How threads works & how to use them in our C programs ?
+
+Now that we understand the history of this concept, we will dig more
+into its implmenetation & learn more about how it does work.
+
+Every process can have multiple threads, every thread is set of
+instructions just like a function for exemple. Once a process is being
+exectued on the cpu, what really happens is that one of the threads
+composing this process is being executed. If the cpu is multicore and
+has hyperthreading capability, then multiple threads of the same process
+can run at the same time which makes the overall process execution
+quicker.
+
+We've learned how multiprocessing works, and we know that every process
+gets his own pid & virtual address space. Therefor, since threads are
+components of a process, these shares the same address space. This is
+very critical to understand, since now, you can comunicate within the
+same process much more easily, but there is a danger to it that we will
+discuss later.
+
+Now that we understand how threads works, we will see how they can be
+used in our C programs. Code snippet below.
+
+`<br>`{=html}
+
+``` c
+    
+    #include <stdio.h>
+    #include <pthread.h>
+
+    void * routine(void *);
+
+
+    int main(void)
+    {
+        // init a canvas struct instance
+        canvas_t canvas;
+        ...
+
+        
+        // render the canvas in another thread to not block the main computation thread
+        pthead_t canvas_rendering_thread;
+
+        int thread_creation_status = pthread_create(
+            &canvas_rendering_thread,       // refrence to pthread_t struct instance
+            NULL,                           // refrence to pthread_attributes struct instance, NULL for default
+            &routine,                       // refrence to routine/function that will be exeucted on the thread
+            (void*) &canvas                 // refrence to argument of the routine.
+        );
+
+        if(thread_creation_status == -1)
+        {
+            printf("Canvas can not be rendered. \n");
+        }
+
+        ...
+        // at the end of the computation, join (wait for) the thread before exiting.
+        pthread_join(canvas_rendering_thread);
+
+
+        return 0;
+    }
+
+    void* routine(void*struct)
+    {   
+        // each routine or function that is passed to the thread_create should 
+        // respect this signature.
+
+        canvas_t *canvas =  (canvas_t*) struct;
+
+        canvas->render();
+
+        return NULL;
+    }
+
+
+```
+
+`<br>`{=html}
+
+As you can see, we can create threads in C using the `pthread.h` library
+functions. They are self explanatory and the comments are there to
+clarify the less intuitive ones.
+
+Also from that code snippet, we can see how this cuncurrent program is
+thought through. We have a set of tasks, and if a task can be done a
+side or delegated per say, well fire up a new thread and assign that
+task to it. Then just before the end of the process execution, make sure
+to join all the threads to the main one, so as a process does not
+vanishes while the cpu is actually executing one of its threads.
+
+As an analogy we can think of git branches. Here, the projet or the
+repositoy is the process and the git branches are the threads. If you &
+your team tries to do everything on the master branch, there will be a
+lot of merge conflict and a lot of wait for others to proceed. But as
+soon as you create multiple branches, which is equivalent to creating
+mulitple threads, you and your team can now all work concurrently and
+advance much more rapidally. Eventually at the end of the project, you
+will merge or join all the branches or threads to the master one, which
+should be the release branch since it is the main one.
+
+With this example we really get a better picture, since we mapped out
+this concept to real world scenarios.
+
+Now that we really master the conecpt of multithreading, we will
+continue on exploring about the technical dimension of it, and how to
+use it better.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Mutlithreading & shared memory.
+
+As mentioned below, threads are components of a process, and since a
+process only has one virtual address space, the threads needs to share
+it. Frequently when we use threads, we usually have a shared ressources
+that is either read by all the threads or written to by multiple
+threads.
+
+When a shared ressrouces is read by multitple/all the threads, there is
+not problem. The shared ressrouces is constant and state is preserved.
+The problem comes when multiple/all threads tries to write to the same
+master ressource. To understand this well, we need to take a step back
+and review how processes are executed on the cpu.
+
+On the cpu point of vue, a process is just an array of threads, each
+thread is forwarded by the OS-kernal, and also managed by the OS-kernal
+load balancer so as all the threads get to be exectued. This implies the
+fact that a thread can be pulled of from the execution line so as
+another one can go on. This means that each thread assembly code is not
+really finished in one go. Therefor a thread can be pulled of the cpu in
+the middel of an instruction, since C instructions generaly maps to more
+then 2 assembly instructions.
+
+To better picture that, let's use a scenario example. The code snippets
+below targets one C instruction and its equivalent on assembly ( or
+pseudo assembly ).
+
+``` c
+
+    ...
+    counter = counter + 1;
+    ...
+```
+
+`<br>`{=html}
+
+``` asm
+    
+    ...
+    move counter to register;
+    add   1 to register;
+    flash register to memory;
+    ...
+```
+
+`<br>`{=html}
+
+As we can see, even a simple C instruction maps to three cpu directives,
+and since the cpu only deals with these one at the time, every thread
+can be pulled of from its execution in the middle of the same C
+instruction.
+
+To go back to the shared ressource problem, let's imaging that we have
+two threads that executes the C code conccurently. Also, it happens to
+be that the counter variable is on a while loop that does three
+iterations. You might think that since we have two threads and every
+thread also does three iterations on the while loop, the end value of
+the counter should be its initial value + 6.
+
+Well that can happen, but it is not garenteed.
+
+To understand this claim, let's imagine the first thread execution and
+at the end of the second line in the above three assembly instructions
+it gets pulled of from the cpu. The second thread goes on and increments
+the counter, then the first one goes back and now continues, which means
+that it will flash its register state to the memory. The problem is that
+its register state are old and the counter had already incremented by
+the second thread, and by flashing these old register state we actually
+do the same value incriment twice.
+
+This littel chronogram showcases a bit more clearly what is explained
+here. Let's assume that the register only contains the counter value and
+it starts at 1.
+
+
+    CPU # current thread: 1         CPU # current thread: 2         CPU # current thread: 1             CPU # current thread: 2
+        # start register: 1             # start register: 1             # start register: saved             # start register: 2
+        # end register  : 2             # end register  : 2             # end register  : saved             # end register  : 3
+
+    RAM # start state =   1         RAM # start state =   1         RAM # start state =   2             RAM # start state =   2
+        # end state   =   1             # end state =     2             # end state   =   2                 # end state   =   3
+
+        (no flash to mem)       (flash to mem, full increment)   (no mem scan, & outdate flash)     (flahs to mem, full increment)
+
+    ------------------------------------------------------------------------------------------------------------------------------------->
+                                                    time 
+
+As you can see, if we do not make sure that the writes actually get
+completed, there is no garentee on getting the proper end result.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Managing shared memory with mutexes.
+
+Now that we've understand what could happen if you let multiple threads
+write to the same share memory at the same time, we need to find &
+master a new concept/tool that will help us to fix this issue.
+
+The problem in short is the fact that a thread can be pulled of from the
+cpu while it is currently doing a task before finishing it. This
+especially matters when the task aims to update a shared memory state.
+
+Fortunatly there is a simple concepte/tool that will help us deal with
+this issue. The idea is to lock the ressrouce until a thread finishes
+its action with it. This will prevent another thread coming in to
+interrompt or to be canceled. This concept aims at creating a critical
+region just around the code that updates the shared memory state. The
+critical region is equiped with a lock that can be used to lock the
+shared ressrouce and then actualy do something completely even across
+offcpu periods regarding the same thread. Then once the thread has done
+its instructions that are within the critical region, the thread will
+unlock the sharred ressource so as another one might come in.
+
+Professor Jarry Cain from standford explains this very briantelly with
+an analogy. Imagine that you are at a party, everybody is a thread that
+does something within a process which is the party itself. All the
+threads have a shared ressrource which happens to be the bathroom. Only
+one person/thread at a time can be on the bathroom, if one goes in,
+he/she locks the door and do his/her thing and eventually come out after
+unlocking the door. So the thread goes in, locks the ressource, then
+once it finishes its personal/own task it pop out and unlock the
+ressource so as others can go in.
+
+This analogy illustrates very well how threads mutexes works, a mutex is
+just like a key of a door, each thread when it needs to use the shared
+ressrouce it locks it and then does what it needs to do, and then at the
+end unlocks it to let others do the same. The key point is the
+lock/unlock cycle, you do want to lock since other threads progression
+might interfere or be omitted, and you do want to unlock since other
+threads progression should also be regarded.
+
+To implement this concept in our C programs, we need to use mutexes,
+these are tools that we can import from the `pthread.h` library. We will
+now revisit the C code above to showcase how it should be used.
+
+`<br>`{=html}
+
+``` c
+
+    # include <stdio.h>
+    # include <pthread.h>
+
+    // declare globaly our lock struct
+    pthread_mutex_t lock;
+
+    // declare globaly our counter, (shared ressource)
+    int counter=1;
+
+
+    void* routine(void*);
+
+    int main(void)
+    {
+        // declare our set of threads
+        pthread[2] threads;
+
+        pthread_create(&(threads[0]), NULL, &routine, &counter);       
+        pthread_create(&(threads[1]), NULL, &routine, &counter);       
+
+        // init our lock struct
+        pthrad_mutex_init(&lock);
+
+        ...
+        
+        // join the threads
+        pthread_join(threads[0]);
+        pthread_join(threads[1]);
+
+
+
+        printf("The counter value should always be incremented by twice, counter=%d\n", counter);
+
+        // free our lock struct
+        pthread_destroy(&lock);
+
+        return 0;
+    }
+
+    void* routine(void* struct){
+        
+        int * pcounter = (int*) struct;
+
+        pthread_mutex_lock(&lock);              // lock the shared ressrouce
+        
+        printf("Critical region, only one thread at the time. current_thread_id = %d\n", pthread_self());
+        (*pcounter)++;                          // update the shared ressrouce.
+        
+        pthread_mutex_unlock(&lock);            // unlock the shared ressource
+
+        return NULL;
+    }
+
+
+
+
+```
+
+`<br>`{=html}
+
+As you can see locking & unlocking the shared ressource on a
+multithreaded program is relatively simple to implement. That being said
+you must always make sure that you are completing the lock/unlock cycle,
+and for performance reasons, make sure that the critical region is as
+small as it can be, otherwise you will end up not that far from a single
+threaded program.
+
+If we go back to our analogy, not completing the cycle is like if
+someone goes into the bathroom and runs outside by the bathroom's
+window. As such everyone else is now blocked. (not really sure that they
+will like that XD)
+
+Also, if you make the critical region wider than it should be, it is
+just like if in the party you do not lock only the bathroom but all the
+floor in which the bathroom is. This keeps you safe of interroptions but
+the cost is that everyone should leave the appartement, and if you do
+so, you end up alone ( a single threaded scenario :/ ).
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Recap
+
+To sum up, a thread is a component of a process, and a process can have
+mutliple threads in which case we call it a multithreaded program. Since
+a process have one address space, all the threads shares it. Since the
+threads can share the same memory, you need to make sure that they do
+not overlap/interrompt each other. If the threads are there only to
+consume the shared memory, no worries at all, but as soon as they mutate
+the shared state, you need to lock the ressource so as only one thread
+does that at the time, and eventually unlock it to let other threads go
+in.
+
+Good rule of thumb is to always strive to make the lock/unlock cycle as
+quick as possible and also complete everytime.
+
+For further multithreading C programing & overall concurrent
+programming, I would advise you to go and check out the Stanford CS107
+course about programming paradigms, the lecturer M. Jarry Cain is very
+talented and explains the notions very well.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------

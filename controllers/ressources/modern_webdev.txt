@@ -5,7 +5,7 @@ That was fine since our web app back then were small compared to the size of the
 So that practice is not ideal for the current needs of the industry, so we developped a new way of developement and that by using a modern flow of structuring our code.
 
 
-This new way is all about archituchture, we call it the moduledriven developement, and as it sounds, all we do is to build modules that we will connect to each other in order to build more complex modules and finnaly our final resault.
+This new way is all about archituchture, we call it the module driven developement, and as it sounds, all we do is to build modules that we will connect to each other in order to build more complex modules and finnaly our final resault.
 
 But what is actually a module?
 A module is a single file, that contains some specific code that is charged to do or process a certain task. So one module equal one file equal one functionnality. 

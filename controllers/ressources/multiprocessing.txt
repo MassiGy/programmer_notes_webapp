@@ -1,35 +1,413 @@
-How can we define the multiprocessing behaviour?
+# Let's learn about multiprocessing.
 
-First, we need to know what is multiprocessing, it is basicly the ability of running several processes at a given time, even if we have one processor and one central memory.
+## Ressources:
 
-How is that possible?,
+-   [Youtube
+    playlist.](https://youtube.com/playlist?list=PLfqABt5AS4FkW5mOn2Tn9ZZLLDwA3kZUY)
 
-Well, in the processor view, multiporcessing means that the processor is executing, let say 3 processes, at a given time, but in the real world, what happens is that the processor is jumping back and forth from one process to another, so basicly it executes some instruction in the porcess number 1, then it goes and executes some instructions in the process number 2, and the it goes and executes some instructions in the prcess number 3, and it keep doing this until all processes are done.
+------------------------------------------------------------------------
 
-So in reality, multiprocessing is not possible, but we assume that it is, because the processors are able to switch back and forth so rapidly that we don't notice any diffrence!
+`<br/>`{=html}
+
+## Introduction
+
+To really understand multiprocessing we need to go a step back and
+understand how processes are being executed in our machines.
+
+It all starts when our machine is booted, the first process is launched
+which is the init process. This one will spawn off multiple other
+processes to get our machine going.
+
+Each time that a process generates another one, the caller is
+represented as the parent, and the callee as the son. Each one of the
+running processes gets its own address space and process id, or pid for
+short.
+
+The kernel cpu load balancer takes over managing which of the processes
+is going to be executed at the time being. The kernel role is very
+critical since it makes sure that every processes does not overload the
+cpu and also does not get left aside.
+
+So at the end, multiprocessing is just about having multiple processes
+seemingly run at the same time. Thanks to the multicore CPU and the
+kernel balancer.
+
+------------------------------------------------------------------------
+
+`<br/>`{=html}
+
+## How to take advantage of multiprocessing in our C programs ?
+
+Now that we understand the ecosystem, we will equipe ourselves with
+tools that will bring up the benefits of multiprocessing to our C
+programs. To do so, we will learn new functions and new ways of
+programming. Also, in some courses this type of programming might be
+referred as cunccurent programming paradigm.
+
+### How to create/spawn a new process from our C program ?
+
+`<br>`{=html}
+
+To create a new process within our C programs we need to use the
+`fork()` function. This one is found in the `unistd.h` library for linux
+machine.
+
+Once called, the `fork()` function has three diffrent return values. All
+values are `int`(s) or rather `pid_t`. The code snippet below showcases
+the diffrence.
+
+`<br/>`{=html}
+
+``` c
+
+    #include <stdio.h>
+    #include <unistd.h>
 
 
-Meanwhile, in the memory view, multiprocessing means that we need to devide that physical memory into chunks that fits all the processes needs, and also we need to make sure that no process is touching to the memory chunk of another porcess.
+    int main(void)
+    {
+        // calling the fork function to create a new process
+        pid_t res = fork();
 
-To do that, the operating system will basicly give all the processes a sub set of the physical memory, and let the porcess think that it owns it, and it will act just like if it is the main memory. So it well afford that the operating system gave him some sort of virtual memory which is as the physical memory devided to segments, like the stack, the heap, the code and the data segment, and this in order to not interrupt the process execution cycle.
+        if(res == -1)
+        {
+            // fork could not create a new process
+            printf("Error on fork call.\n");
+        }
+        else if(res == 0)
+        {
+            // here we are on the child process space
+            printf("Hello there from %d\t, my parent is %d\n", getpid(), getppid());
+        }
+        else {
+            // here we are on the parent process space, and res contains
+            // the actual pid of the child process
+            printf("Hello there from %d\n", getpid());
+        }
 
-Then the operating, system will translate the behaviour of the process towards the vertual memory that it owns, into some sort of a similar behavior but with the physical memory this time, in other words, it will map the interaction of the porcess with it vertual memory to some interation with the same process with the main memory.
+        return 0;
+    }
+ 
+```
+
+`<br/>`{=html}
+
+What is important to keep in mind is that when a child process gets
+created with fork, a hole new address space is created in memory, and
+both of the parent & child processes will continue executing the same
+code from that line where fork() is invoked. That is possible because
+the newly created address space is an exact copy of the parent's one.
+
+### How & Why to wait for a child process ?
+
+`<br>`{=html}
+
+Now that we understand how to create new processes, we need to learn how
+to wait for them until they finish. But why bother, you might say ?
+
+Well, let's take the previous scenario as an example, and let's say that
+the parent processes arrives at the return statement first and exits
+from the processes list. What happens to the child process after that.
+
+Well since its parent is gone, it will be attached to its grand-parent,
+but this behaviour should not be a norm, since it makes things harder to
+monitor and manage. So this is the first drawback.
+
+Another drawback might be if the child process is aborted, or abnormaly
+stopped. In this senario waiting for it, or more technically waiting for
+its exit/termination status would be helpful, since it infroms us what
+actually caused the child process to stop.
+
+Also, not doing so will cause the child process to become a zombie
+process, which basically refers to the state where its code would never
+be executed (dead cpu-wise), even if its address space is still layed
+out in memory (alive memory-wise). This mix of dead on cpu and alive on
+memory pushed us to call it a zombie process.
+
+So now that the motivation is explained, we need to learn how to wait
+for a child process. One thing to keep in mind, is that naturally the
+one which waits is the parent process, since it is the one which created
+the child process. To do so, we will use the `wait()` function, that is
+imported from the `sys/wait.h` library.
+
+This C code snippet showcases the usecase of it.
+
+`<br/>`{=html}
+
+``` c
 
 
-To do that, the os is calling a unit called memory manager, and it will do the maping transaction, to make it simple, we can think that this memory manager it like a function that takes to arguments, the first one which will be the process id, and the second one the address of the virtual memory that this process is trying to access or with which it is interacting with, and then map this vertual address into a real address in the main memory, so with this logic set, we can afford to run multiple processes in one time, because we have the ability to equaly devid the memory and also our processor is fast enough to create this illusion that these processes are running at the same time, and that by jumbing back and forth from one to another until all of them are done!
+    #include <stdio.h>
+    #include <unistd.h>
+    #include <sys/wait.h>
 
 
+    int main(void)
+    {
+        // calling the fork function to create a new process
+        pid_t res = fork();
+
+        if(res == -1)
+        {
+            // fork could not create a new process
+            printf("Error on fork call.\n");
+        }
+        else if(res == 0)
+        {
+            // here we are on the child process space
+            printf("Hello there from %d\t, my parent is %d\n", getpid(), getppid());
+            exit(0);                    // exit from the child process.
+        }
+        else {
+            // here we are on the parent process space, and res contains
+            // the actual pid of the child process
+            printf("Hello there from %d\n", getpid());
+            wait(NULL);                     // waits until a child process exits
+        }
 
 
+        printf("Since we've waited, this message should be printed on the parent process only. Current pid =%d\n", getpid());
+        return 0;
+    }
+
+```
+
+`<br/>`{=html}
+
+Note that, as the comment says, the wait function contrary to the
+waitpid function does not wait for a specific child process. The first
+there, the first to be taken in charge of. To wait for a specific
+process, consider using the waitpid function.
+
+Also, note that the parameter for wait is null and the reason for that
+is we did not care about the exited status code of the child process.
+But since we've seen that it can be critical in some scenarios, we will
+now disscuss it.
+
+The wait function takes a reference, this should be a pointer to an int.
+Once given that, the wait function will write the exit status code of
+the child process in that variable. To access the value of the exit
+status code we need to use some macros.
+
+The C code snippet below showcases the most important ones.
+`<br/>`{=html}
+
+``` c
+
+    #include <stdio.h>
+    #include <unistd.h>
+    #include <sys/wait.h>
 
 
+    int main(void)
+    {
+        // calling the fork function to create a new process
+        pid_t res = fork();
+
+        if(res == -1)
+        {
+            // fork could not create a new process
+            printf("Error on fork call.\n");
+        }
+        else if(res == 0)
+        {
+            // here we are on the child process space
+            printf("Hello there from %d\t, my parent is %d\n", getpid(), getppid());
+            exit(12);                    // exit from the child process with some exit status code
+        }
+        else {
+            // here we are on the parent process space, and res contains
+            // the actual pid of the child process
+            printf("Hello there from %d\n", getpid());
+            int child_exit_info;
+            wait(&child_exit_info);                     // waits until a child process exits
+
+            if(WIFEXITED(child_exit_info) != 0)
+            {
+                // this means that the child exited with something else then 0, which tepically means 
+                // an error, then we should invistigate more !
+
+                int child_exit_status_code = WEXITSTATUS(child_exit_info);
+
+                printf("Child process exited with exit status code of %d\n", child_exit_status_code);
+
+                // do something here 
+            }
+        }
 
 
-ressource: https://www.youtube.com/watch?v=TRfbJIsDBIM&list=PL9D558D49CA734A02&index=14
+        printf("Since we've waited, this message should be printed on the parent process only. Current pid =%d\n", getpid());
+        return 0;
+    }
+
+```
+
+`<br/>`{=html}
+
+Also, it should be mentioned that these status codes are 1 byte sized,
+so they go from 0 to 255. Sometimes they are used to pass actual
+informations, but make sure that the information holds into that range,
+and in my opinion this is kind of an abuse, since if you really want to
+pass informations from a process to another, you better be with pipes.
+
+Finaly, sometimes even if the child process end with an errors or
+something bad happens, you can not fix everything from the scope of the
+parent process. To deal with that, we can in C and bash handle signals
+and set routines that would be invoked if an error or an abnormal state
+occures.
+
+The main functions are `at_exit()` and `on_exit`, these will allow the
+developer to set a stack of routines that would be invoked in abnormal
+exits. They both aims to the same thing, but you should know that
+on_exit is not following the POSIX standards and it is not cross
+platefrom. So if you can, stick to at_exit/atexit.
+
+Besides that, as we've described them, there will be a "stack" of
+routines to be called, which means if the time comes, the routines will
+be invoked in the reverse order of their setup.
+
+------------------------------------------------------------------------
+
+`<br/>`{=html}
+
+### How to kill/destroy a process from our C program ?
+
+`<br>`{=html}
+
+Sometimes, we write programs that should kill or interropt some other
+processes for the current process proper execution. As for an exemple,
+mysql-server or any database server in the same host machine might kill
+itself if invoked again, and that's maybe because the used port is the
+same.
+
+So, to kill a process or to inerropt a process from the current one, it
+is just about emitting a signal to that given process. To do so, we need
+the target process pid and the wanted signal code or name.
+
+The following C code snippet showcases how to do so. `<br/>`{=html}
+
+``` c
+
+    # include <sys.h>
+
+    ...
+
+    // kill the process knowing its pid
+    pid_t pid = 3030;
+    kill(pid, SIGKILL);
+
+    ...
 
 
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## Why learn multiprocessing ?
+
+Now that we've learned how to use multiprocessing, it should be helpful
+to stress why it is important to master this new knowledge.
+
+Main advantages:
+
+-   Multiprocessing allows you to use more cores of you cpu that
+    enhances your overall performance.
+-   Multiprocessing allows you to invoke other programs aside of your
+    current program.
+
+Since the first one is pretty much self explaining, we will rather dig
+more about the second one.
+
+Invoking other programs as child processes along side your current main
+process might be extremly helpful. In fact, we are using it every day.
+Take a look at your favourite terminal shell, once you call a command,
+what happens is that the bash/sh/zsh/ksh/csh/fish shell will fork a
+child process and replace it with the entered command. To test this,
+type `exec google-chrome` in your terminal and see what happens.
+
+You've probably observed that google chrome opened and the terminal
+prompt vanished, that is because we altered the behaviour of our shell,
+instead of forking and replacing the child process with the specified
+program, here we forced the parent process to not fork and exec directly
+the specified program, which in turn replaces the main/parent program
+which was the terminal by the specified program.
+
+So the proper way is to fork and then replace the child process with the
+target program. The following C code snippet showcases how to do so.
+
+`<br>`{=html}
+
+``` c
+
+    #include <stdio.h>
+    #include <unistd.h>
+    #include <sys.h>
 
 
+    int main(void)
+    {
+        // calling the fork function to create a new process
+        pid_t res = fork();
+
+        if(res == -1)
+        {
+            // fork could not create a new process
+            printf("Error on fork call.\n");
+        }
+        else if(res == 0)
+        {
+            // here we are on the child process space
+            printf("Hello there from %d\n", getpid());
+           
+            // invoke another program
+            execl("google-chrome","google-chrome","--url", "github.com");
+
+            // since the child process is replaced, nothing will be exectued after the execl.
+
+        }
+        else {
+            // here we are on the parent process space, and res contains
+            // the actual pid of the child process
+            printf("Hello there from %d\n", getpid());
+        }
 
 
+        printf("This message should be printed on the parent process only. Current pid =%d\n", getpid());
+        return 0;
+    }
 
+```
+
+As you can see, the function is similar to the one used on the terminal,
+and we actually have other variants as well. The main diffrence it how
+the arguments are passed and how the programs should be invoked.
+
+`<br>`{=html}
+
+Besides that, if you want to just benefit from another program without
+forking and of course not loosing your current program, you can use the
+`system` function that basically do it for you behind the scenes.
+
+The following C code snippets shows how to do so.
+
+`<br>`{=html}
+
+``` c
+
+    ...
+
+    /* use wc command to get the lines count*/
+    int res = system("wc --lines ../dist/maze.txt > ../dist/maze_lines_count.txt");
+    assert(res == 0);
+    
+    ...
+
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}

@@ -1,0 +1,667 @@
+# Let's learn about authentication & authorization.
+
+## Ressources:
+
+-   [The web developer bootcamp, by Colt
+    STEEL.](https://www.udemy.com/course/the-web-developer-bootcamp)
+
+## Authors:
+
+-   [Massiles Ghernaout.](https://www.github.com/MassiGy)
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What is authentication ?
+
+Authentication is the process of making sure that a user is really who
+is pretending to be. During an authentication, the user needs to
+transmit his credentials to the service provider, so as this one can
+verify if either the user had given the right information about himself.
+
+This is the basic login functionality, once the user confirms he can
+pass & take advantage of the service, otherwise the user will be alerted
+& informed that the credentials are wrong. Eventually if the user tries
+a bunch of wrong credentials at once, you can take action to stop him,
+or even ban him.
+
+So before authentication, the user must register/signup, in this process
+the user will create an identity via which the service provider can
+relate/recognize him.
+
+After that, as long as the service provider remembers/recalls the user
+identity, this one does not need to login. But as soon as the service
+provider loses sight of the user, this one will be prompted to login.
+With this process we ensure that the user is authenticated with the
+valid identity across time.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## How to implement authentication ?
+
+Now that we've understood the basic idea of authentication we will learn
+how to implement it. For this guide, we will illustrate the concepts
+with code snippets written in JavaScript, using the Express.js
+framework.
+
+To implement authentication, we need to implement all the major steps of
+it. It starts with registering/signup, then login, then logout and
+finally signout.
+
+Quick definitions:
+
+-   In the signup, the user creates an account.
+-   In the login, the user "reactivates/revalidates" his account.
+-   In the logout, the user "deactivated/suspended" his account.
+-   In the signout, the user deletes his account.
+
+Also since we do not force the user to login each time, we need a
+mechanism to preserve state on subsequent requests. To do so, we have
+two strategies, we can either use server side sessions or client side
+json web tokens.
+
+For this document, we will use server side sessions.
+
+`<br>`{=html}
+
+### **Sessions setup:**
+
+Now that we know what mechanism to use, we will go ahead and implement
+the underlying systems for the session. To do so, we will use Express
+related packages. These packages are hosted in npm, and run on nodejs.
+
+`<br>`{=html}
+
+``` sh
+
+
+   npm install express express-session
+
+```
+
+`<br>`{=html}
+
+Now that we have the packages, go ahead & import them in your server
+script file.
+
+`<br>`{=html}
+
+``` javascript
+
+
+   const express = require("express");
+   const app = express();
+   const session = require("express-session");
+
+```
+
+`<br>`{=html}
+
+Then, go ahead and create a config object for your sessions, and add it
+to the middleware sequence.
+
+`<br>`{=html}
+
+``` js
+
+
+   const sessionConfig = {
+       name: String(process.env.SESSION_NAME),          
+       secret: String(process.env.SESSION_SECRET),           // your session signature secret string
+       saveUninitialized: false,                              // if session empty, do not save it
+       resave: false                                         // save only if changed
+   }
+
+
+
+
+   app.use(session(sessionConfig));
+
+
+
+```
+
+`<br>`{=html}
+
+Now our sessions are set up, we need to discuss a bit where to store
+them and also how to set up our cookies, since these are what we need to
+maintain state between the server & the client. In other words, the
+session is on the server to keep track of the whole user identity if we
+want, and the cookie is like a ticket that can be passed back & forth to
+ensure & maintain the communication.
+
+In this guide, we will simply set our store as file based, using a
+directory. Also, for our cookies we just need to add some options to the
+session configuration (because our cookies are related to our sessions).
+
+To store our sessions in a local directory, we need to install a new
+package.
+
+`<br>`{=html}
+
+``` sh
+
+
+   npm install session-file-store
+
+```
+
+`<br>`{=html}
+
+Then we need to set it up to work with express.
+
+`<br>`{=html}
+
+``` js
+
+
+   const fileStore = require("session-file-store")(express);
+
+```
+
+`<br>`{=html}
+
+After that, we need to add it to our sessions config.
+
+`<br>`{=html}
+
+``` js
+
+
+   const sessionConfig = {
+       name: String(process.env.SESSION_NAME),          
+       secret: String(process.env.SESSION_SECRET),           // your session signature secret string
+       saveUninitialized: false,                              // if session empty, do not save it
+       resave: false,                                        // save only if changed
+       store: new fileStore()                                // this will save our sessions to ./sessions
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+Then of course we need to set up the cookies. As mentioned below, our
+cookies will only be a ticket-like instance to refer to the user session
+on the server. So our cookies will be a component of our sessions that
+only holds the session id. It is just like a reservation ticket, it does
+not hold the seat (obviously it can't ), but only its number.
+
+`<br>`{=html}
+
+``` js
+
+
+   const sessionConfig = {
+       name: String(process.env.SESSION_NAME),          
+       secret: String(process.env.SESSION_SECRET),           // your session signature secret string
+       saveUninitialized: false,                              // if session empty, do not save it
+       resave: false,                                        // save only if changed
+       store: new fileStore()                                // this will save our sessions to ./sessions
+
+
+       cookie : {
+           httpOnly: false,                                 // cookie are allowed in http to to speed up dev.
+           maxAge: 1 * 24 * 60 * 60 * 1000,                  // maxAge = 1 day
+       }
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+### **Signup:**
+
+Now that our sessions are set up, we can go and start with the first
+phase of user authentication. In the registering process the user
+creates a new account and then gets granted access to the service
+ressources. But when we do so, we will hash the user password, so even
+if our database gets hacked the password can not be reused or taken
+advantage of. To hash the password, we chose to use `bcrypt.js`, and we
+installed it as such.
+
+`<br>`{=html}
+
+``` sh
+
+
+   npm install bcryptjs
+
+```
+
+`<br>`{=html}
+
+Then we need to import it wherever we use it.
+
+`<br>`{=html}
+
+``` js
+
+
+   const bcrypt = require("bcryptjs");
+
+```
+
+`<br>`{=html}
+
+So the steps are as follows:
+
+-   Create the user account in our database/user store.
+-   Give/send back a ticket/cookie to the user, so he does not get asked
+    to login every time.
+-   Inform the user of the operation's success.
+
+The code snippet below showcases how to do so. The used database is
+mongoDB.
+
+`<br>`{=html}
+
+``` js
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+  
+
+
+   module.exports.register = async(req,res) => {
+    
+       // data validation
+       ...
+     
+
+
+     
+       // hash the password
+       const salt = bcrypt.genSaltSync(12);
+       const hash = bcrypt.hashSync(String(typedInfo.password), salt);
+      
+       typedInfo.password = hash;
+
+
+
+
+       // save the new user object
+       const newUser = new User({typedInfo});
+       newUser.save();
+
+
+
+
+       // add the user id to the session.
+       /**
+           * this will not only create a new session in our ./sessions, but it will also create a cookie
+           * containing this session id and which will be sent back to the user browser.
+           *
+       */
+
+
+       req.session.active_user_id = newUser.id;
+
+
+
+
+       // send a success message
+       res.send("Successfully signed up.");
+
+
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+Now that the user has registered, he is marked or seen as logged in as
+long as the cookie that he holds is still valid. For this guide, we've
+set a cookie max age of 1 day, so the user needs to login in 24 hours.
+
+`<br>`{=html}
+
+### **Login:**
+
+`<br>`{=html}
+
+Let's assume that a day went by, and the user needs to login to have
+access again. To do so, we only need to make sure that the user can
+confirm his identity, and then give him a new ticket/cookie.
+
+This code snippet showcases how to do so.
+
+`<br>`{=html}
+
+``` js
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+  
+
+
+   module.exports.login = async(req,res) => {
+
+
+       // validate the user data
+       ...
+
+
+
+
+       // get the user information from the database
+       const userInfo = await User.findOne({username});
+
+
+       // make sure that the user typed info is the same as the storedInfo
+
+
+       const data_valid = userInfo.username == typedInfo.username;
+
+
+       const hashed_password = userInfo.password;
+       const is_password_same_as_hash = bcrypt.compare(typedInfo.password, hashed_password);
+
+
+       data_valid = data_valid && is_password_same_as_hash;
+
+
+
+
+       if(data_valid)
+       {
+           // generate a new cookie for the user & reactivate the session
+           req.session.active_user_id = userInfo.id;
+
+
+
+
+           return res.send("Successfully logged in.");
+
+
+          
+       } else {
+
+
+           // redirect to the login page
+
+
+           return res.send("Invalid credentials.");
+
+
+       }
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+### **Logout:**
+
+`<br>`{=html}
+
+Now that the user has the ability to register and login, it would be
+great if we give him the ability to logout also. The logout process aims
+to make his session suspended and deactivated until he logs in again.
+
+To implement this feature, we only need to disconnect the user session
+with the request/response cycle. The following code snippet showcases
+how to do so.
+
+`<br>`{=html}
+
+``` js
+
+
+   module.exports.logout = (req,res)=> {
+       req.session.active_user_id = null;
+
+
+       res.send("Successfully logged out.");
+   }
+
+```
+
+`<br>`{=html}
+
+Keep in mind that we only need to disconnect the user session with the
+request response cycle and not destroy the session, since that is the
+signout behavior.
+
+`<br>`{=html}
+
+### **Sign Out:**
+
+`<br>`{=html}
+
+As mentioned below, we also need to give the user the right to
+delete/erase its account from our database. To do so, we usually also
+need to delete all the user posts, comments or activity to prevent bad
+data referencing.
+
+The code snippet below showcases how to do so.
+
+`<br>`{=html}
+
+``` js
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+  
+
+
+   module.exports.signout = async(req,res) => {
+
+
+       // validate the user typed data
+       ...
+
+
+
+
+       // get the user information from the database
+       const userInfo = await User.findOne({username});
+
+
+       // make sure that the user typed info is the same as the storedInfo
+
+
+       const data_valid = userInfo.username == typedInfo.username;
+
+
+       const hashed_password = userInfo.password;
+       const is_password_same_as_hash = bcrypt.compare(typedInfo.password, hashed_password);
+
+
+       data_valid = data_valid && is_password_same_as_hash;
+
+
+
+
+       if(data_valid)
+       {
+           // destroy the user;
+           User.deleteOne({username});
+
+
+           // destroy the current session (this will also delete the file in ./sessions)
+           req.session.destroy();
+
+
+           // & inform the user
+           return res.send("Successfully signout.");
+
+
+          
+       } else {
+
+
+           // redirect to the login page
+           return res.send("Invalid credentials.");
+
+
+       }
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+Now that we have the four pillars of authentication, we will dive into
+authorization to take full advantage of this system.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## What is authorization ?
+
+`<br>`{=html}
+
+Authorization is a security layer that sits above authentication, since
+if the user is authorized, this implies that the user is authenticated &
+has the right to proceed.
+
+Since we now know what it means to be authenticated, we will focus more
+on the second half, which determines whether if the user can proceed.
+
+First of all, we need to define the scope of authorization. This scope
+is generally about/around data mutation or data access, respectively
+POST and GET requests. Sometimes, the user can just view some specific
+resources, and almost always the user can only mutate his own ressource.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## How to implement authorization ?
+
+`<br>`{=html}
+
+Now that we've seen what authorization is all about, we will discover
+how to implement it.
+
+To do so, we need two filters,
+
+-   First, we need to check if the user is authenticated.
+-   Second, we need to make sure that the user is either the owner of
+    the ressource, or if this resource is public.
+
+Note: generally in REST APIs, the resources can be seen as soon as we
+are logged in, but to mutate we need to own it.
+
+The first filter can be implemented as a middleware, and the second
+should be added to the controllers. This code snippet showcases how to
+do so.
+
+`<br>`{=html}
+
+``` js
+
+
+   module.exports.isLoggedIn = (req,res, next) => {
+       if(req.session.active_user_id) next();
+       else return res.send("Please login to proceed.");
+   }
+
+```
+
+`<br>`{=html}
+
+For the second filter, we will assume that the user is trying to edit a
+post.
+
+`<br>`{=html}
+
+``` js
+
+
+   const Post = require("../Modals/Post");
+
+
+   module.exports.editPost = async(req,res)=>{
+      
+       // validate the user data;
+       ...
+
+
+
+
+       // query the post info.
+       const post = await Post.findOneById({id: req.body.post_id});
+
+
+
+
+       // make sure that the user is authorized.
+       if(post.authod_id != req.session.active_user_id)
+           return res.statusCode(401).send("Not authorized.");
+
+
+
+
+       // continue and edit the post
+       ...
+
+
+
+
+       // inform the user for the edit
+       return res.send("Post successfully edited.");
+
+
+   }
+
+
+
+```
+
+`<br>`{=html}
+
+Note that we can not check for the authorization as we did here if the
+user is not already logged in. Since the session is only created &
+populated then.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## To lookup for:
+
+`<br>`{=html}
+
+In this guide we've only seen a subset of web based authentication and
+authorization. Here are somethings you can & probably should lookup for:
+
+-   Session stores, here we've used local directory, even if it is
+    easier but that is not very scalable and slow at the same time. You
+    can look up Redis stores or mongodb stores.
+-   Session based authentication is still one of the most used
+    strategies but exploring others won't do any harm. Json web tokens
+    are another strategy worth knowing.
+-   Authentication centric libraries like passportjs are also well known
+    and worth trying.

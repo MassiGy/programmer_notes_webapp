@@ -1,0 +1,50 @@
+# Type de données abstrait.
+
+## Ressources:
+
+-   [Cours sur youtube](https://youtu.be/B0Ww8KpXcw0)
+
+------------------------------------------------------------------------
+
+## Introduction et motivation:
+
+Les types de données abstrait est une notion qui est souvent utilisée
+dans les cours d'algorithmique, elle accompagne les cours des structures
+de données et du pseudo-code. Mais, à quoi ça sert ?
+
+Comme mentionné, les type de donnée abstrait ou TDA sont utilisés en
+pseudo-code. Ce dernier a pour objectif d'écrire/concrétiser un
+algorithme sans se soucier de l'implémentation. Il se trouve que les TDA
+sont justement une autre notion qui vise au même but.
+
+Les TDA sont une représentation des données qui reflète le point de vue
+"utilisation", cela afin de ne pas être liée à un langage de
+programmation ou à une syntaxe donnée. Dès lors, on dit que les TDA sont
+une représentation "abstraite" des données, dans le sens où on ne sait
+que comment les utiliser.
+
+De l'autre côté, les structure de données reflètent
+l'implémentation/l'organisation des données dans la mémoire, ce qui les
+rend dépendantes du langage de programmation utilisé et d'une syntaxe
+prédéfinie. On dit que les structures de données expriment le point de
+vue "implémentation".
+
+------------------------------------------------------------------------
+
+## Description/Spécification/Signature d'un TDA:
+
+Un type de donnée abstrait est introduit avec une sorte de fiche
+technique qui comporte:
+
+-   Le nom du TDA.
+-   La liste des opérations/actions qu'on peut effectuer sur/avec le
+    TDA.
+    -   Pour chaque opération, on exprime les types d' entrées.
+    -   Pour chaque opération, on exprime les types de retour.
+    -   Pour chaque opération, on exprime sa complexité.
+-   La liste des principes/axiomes à respecter lors de l'utilisation du
+    TDA.
+    -   Dans chaque axiome, on cite une opération et une règle
+        d'utilisation vis-à-vis de celle-ci.
+
+------------------------------------------------------------------------

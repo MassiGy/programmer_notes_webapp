@@ -1,0 +1,356 @@
+# Let's learn bash scripting.
+
+## Ressources:
+
+-   [Youtube
+    playlist.](https://youtube.com/playlist?list=PLT98CRl2KxKGj-VKtApD8-zCqSaN2mD4w)
+-   [Learn shell online.](https://www.learnshell.org/)
+
+------------------------------------------------------------------------
+
+## Variables:
+
+In bash we can declare variables just by giving a value to a name, like
+a key value pair. Then to refrence the value of a certain variable, we
+refer to it using a dollar '\$' sign before its name.
+
+``` sh
+
+    # declare a variable 'cost'
+    cost=12
+
+    # echo to value of the variable 'cost'
+
+    echo $cost
+
+    # another echo, with interpreting the value of a variable
+
+    echo "the price per unit is $cost"
+
+    # another echo, without interpreting the value of a variable
+
+    echo 'the price per unit is $cost'
+```
+
+**Notes**: As in php, if you want to reference a variable inside a
+string, you need to have a string using double quots and write the
+variable along side the dollar sign in the string itself.
+
+A more useful usecase is to use bash variables to capture/catch the
+output of a command. We can use that by invoking the given command in a
+sub shell, and capture the returned value.
+
+``` sh
+
+    # declare a variables that will store the files names of the current dir
+   
+    files=$(ls -F)                      # ls -F lists the files of this dir
+
+    # then you can implement a for each behavior, with either xargs or a for loop
+
+    echo $files | xargs code
+    
+```
+
+------------------------------------------------------------------------
+
+## Math:
+
+To do math in bash it is always kind of hidious, the reason is that the
+symbols used in math operations are generaly used for something else.
+But, that said, bash has a work around, and you can do math as follows:
+
+*Using the expr command*: `expr` is short for expression and it allows
+us to evaluate math expressions. *Using the bc command*: `bc` is short
+for bash calculator and it allows us to evalue math expressions too.
+
+**Notes**: when using, - `expr` to do a multiplication, you have to
+escape the \* (wildcard) character. - `bc` to do a real division, you
+have to add the -l option (long numbers)
+
+``` sh
+
+    expr 10 \* 2                # gives us back 20
+    
+    expr 10 + 50                # gives us back 60
+
+
+    echo "10 * 2" | bc          # gives us back 20
+
+    echo "10 / 2" | bc -l       # gives us back 5
+```
+
+------------------------------------------------------------------------
+
+## Conditionnals:
+
+To use conditionnals in bash you just need to use an if statement just
+like any other programming language. The one thing to keep in mind is
+the syntax.
+
+``` sh
+
+    # read user input
+    read cost
+
+    # confirm
+
+    echo "the set cost is $cost"
+
+
+    # take a decision
+
+    if [ $cost -gt 10 ]; 
+    then 
+        echo "the set cost is higher then 30% of the products"; 
+    else
+        echo "the set cost is lower then 70% of the products";
+    fi
+```
+
+As you can see, Bash has useful operators like any other programming
+language, and they are using the same notation as the operators in sql.
+
+*-gt*: for greater than.
+
+*-lt*: for less than.
+
+*-eq*: for equal.
+
+*-nq*: for not equal.
+
+*-ge*: for greater than or equal.
+
+*-le*: for less than or equal.
+
+Also, using if statements, you can be in need to test some sort of
+boolean expressions and to do so, you can use the `test` command. This
+command takes an expression and then exits with either 0 for true or 1
+for false.
+
+It is generaly the oposite of what we tend to think but take it this
+way, if the expression is true then there is 0 erros, and if the
+expression evaluates to false then there is 1 or more errors.
+
+To get the exit code of the `test` command, you need to read the value
+of the `$?` variable.
+
+``` sh
+
+    # test an expression
+    
+    test 10 -ge 3
+
+    # read the exit code
+
+    echo $?             # gives us 0 (which means that there is no error and the expression is true)
+```
+
+------------------------------------------------------------------------
+
+## Loops:
+
+### While loops:
+
+``` sh
+
+    while ! $found
+    do
+        echo "enter your guess"
+        read user_input
+
+        if [ $number_to_guess -gt $user_input ]; then
+            echo "higher"
+        elif [ $number_to_guess -eq $user_input ]; then
+            echo "correct"
+            found=true
+        else
+            echo "less"
+        fi
+
+        sleep 0.5
+
+    done
+```
+
+### For loops:
+
+``` sh
+
+    for i in {1..30}
+    do
+        if [ $(expr $i % 15 ) -eq 0 ]
+        then 
+            echo "fizzbuzz"
+        elif [ $(expr $i % 5 ) -eq 0 ]
+        then   
+            echo "buzz"
+        elif [ $(expr $i % 3 ) -eq 0 ]
+        then 
+            echo "fizz"
+        else
+            echo $i
+        fi
+    done
+
+```
+
+------------------------------------------------------------------------
+
+## Functions
+
+``` sh
+
+    fizzbuzz(){
+
+        counter=0
+
+        while [ $counter -lt $1 ]
+        do 
+
+            if [ $(expr $counter % 15 ) -eq 0 ]
+            then 
+                echo "fizzbuzz"
+            elif [ $(expr $counter % 5 ) -eq 0 ]
+            then   
+                echo "buzz"
+            elif [ $(expr $counter % 3 ) -eq 0 ]
+            then 
+                echo "fizz"
+            else
+                echo $counter
+            fi
+
+            counter=$(expr $counter + 1)
+       
+        done
+    }
+
+
+    fizzbuzz 10
+
+
+    calc(){
+        
+        fst=$1
+        operation=$2
+        snd=$3
+
+
+        case $operation in
+
+            plus) 
+                echo $(( $fst + $snd  ));;
+            minus) 
+                echo $(( $fst - $snd  ));;
+            times) 
+                echo $(( $fst * $snd  ));;
+            devide)
+                echo $(( $fst / $snd  ));;
+            *)  
+                echo "None"
+        esac
+    }
+
+
+    calc 2 times 2
+    
+```
+
+------------------------------------------------------------------------
+
+## Passing arguments:
+
+Bash allows us to give our scripts arguments and to do so we need to use
+positional refrencing, which is used like the following:
+
+*\$1*: first argument
+
+*\$1*: second argument
+
+*\$n*: n'th argument
+
+*\$#*: arguments count
+
+------------------------------------------------------------------------
+
+## Arrays:
+
+``` sh
+
+    # to declare an array, just declare a variable that is equal to a list of values
+    # captured inside of parentheses. Note: the seperator is not a comma but a space
+    numbers=(1 3 4 8 9)
+
+    # to get the length of an array, you need to use this format: ${#array_name[@]}
+    echo "length of the array is : ${#numbers[@]}"
+
+
+    # to get a certain value using an index, we can to this. (indecies are 0 based)
+    limit=$(expr ${#numbers[@]} - 1)
+    counter=0
+
+
+    while [ $counter -lt $limit  ]
+    do
+        echo "@$counter  val=${numbers[$counter]}";
+
+        counter=$(expr $counter + 1);
+    done
+```
+
+------------------------------------------------------------------------
+
+## Strings
+
+``` sh
+
+    # to declare a string, it is just like any other variable
+    text="hello world" && echo $text
+
+    # to get the length of the string, 
+    echo "length of the text is: ${#text}"
+
+
+    # to get a specific caracter at a given index
+    char=$(expr substr "$text" 4 1 )
+    echo "the third character is $char "
+
+
+    # to get the index of a sub string
+    index=$(expr index "$text" "lo")
+    echo "index is set to $index"
+
+
+
+    # to get a sub string
+    base=1
+    len=5
+
+    sub=${text[@]:$base:$len}           # creates substring of length 5 starting from character at index 1
+    echo "substring is $sub"
+
+    # to replace a substring
+
+    old="world"
+    new="there"
+
+    echo ${text[@]/$old/$new}
+
+
+    # to delete a subtring
+    tobeDeleted="hello"
+
+    echo ${text[@]/$tobeDeleted/}
+
+```
+
+------------------------------------------------------------------------
+
+## To keep in mind:
+
+Wheter if it is a string or an array, or even the current bash script
+the:
+
+-   \# symbol always refers to some sort of a length.
+-   @ symbol always refers to all of the arguments/elements/characters

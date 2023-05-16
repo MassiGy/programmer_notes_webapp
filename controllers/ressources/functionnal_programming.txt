@@ -1,0 +1,228 @@
+# Let's learn about functional programming (haskell/JavaScript).
+
+## Ressources:
+
+-   [Youtube
+    course.](https://youtube.com/playlist?list=PLe7Ei6viL6jGp1Rfu0dil1JH1SHk9bgDV)
+
+-   [Youtube video.](https://youtu.be/pUN3algpvMs)
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What is functional programming ?
+
+Functional programming is a style of programming that is derived from
+the declarative paradigm. This means that, when we write our code in a
+functional way, this one reflects what is the problem and the main
+thought process to solve it, but it does not show the implementation
+details, since those are abstracted away via the used functions.
+
+This is very liked in the developers community, since it makes our code
+more descriptive and easy to understand, and now even recruiters are
+mentioning it in the job requirements since it makes the code base very
+easy to walktrough and to maintain. So every newcomer won't spend ages
+trying to understand what a given block of code does.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What is the philosophy of functional programming ?
+
+The underground idea is pretty simple, just program in such a way that
+our code only builds upon function calls and makes these functions as
+similar as the mathematics ones.
+
+Making a function similar to a math function is a very interesting task,
+and we can achieve that by setting some constraints to our programming
+language if it is not already pure functional wise.
+
+First of all, make the function pure, this means that every function
+must be just a relationship between a set of data to another set of
+data, the arguments data type is called the source set, and the data
+type of the returned value is called the destination set. This is the
+closest approach of functions in programming to math's functions.
+
+Besides that, our functions must not create any side effects, the reason
+is simple, if we think mathematically, every function is just a
+relation, there is no context of execution or block of instruction like
+programming has. So given that, we need to write our function to
+illustrate a one-to-one relationship between one argument and one return
+value, that's it !. We can achieve that by making our function accept
+only one argument, and also the code definition should contain only a
+return keyword and some expression to be evaluated.
+
+Also, since we want to write in a purely functional way, we need a
+strategy to chain our functions, and most functional languages choose to
+make function first class citizens so as we can store them in objects
+and pass them as arguments. This is made possible since our functions
+are just some expression that will be evaluated on the execution call
+and returned after that.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What are the building blocks of functional programming ?
+
+Well, this paradigm has some principles to respect, and they go as
+follows: - No loops, only recursion. - No data mutation, assignments
+other than initializations are forbidden. - No more than one argument
+for functions ( actually a function can accept multiple arguments as
+long as it can be curried). - No side effects (actually no side effects
+without returning to the new state after the transformation).
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## How are functions used in functional programming languages ?
+
+In functional programming, functions are just like any other data type,
+even though they are executable, but after all, they are objects that we
+can store in variables and refer to them via their name.
+
+In JavaScript, this is very tangible since JavaScript functions are
+written is so many ways, but the most common is the ES6 way using lambda
+calculus syntax
+
+``` javascript
+  
+   const add = (x, y) => x + y;
+
+```
+
+As we can see, JavaScript arrow functions are pretty much just variables
+with some evaluations to be performed. ( we can refer to them as macros,
+just like in the C programming language. )
+
+In functional programming, functions fall into two categories, the
+impure ones, and the pure ones. A pure function does not have any side
+effects, and by comprehension an impure one, is one that generates side
+effects.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What are impure functions ?
+
+Every function that mutates data, or does some kind of printing,
+assignment, memory state mutation and those kinds of things are impure
+functions.
+
+Some examples:
+
+``` javascript
+  
+   const add = (x,y) => {
+       console.log("x+y is equal to ",x + y); // side effect
+      
+       return x + y;
+   }
+  
+   const head = list => {
+       let fst = list.shift(); // data mutation
+       return fst;
+   }
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What are pure functions ?
+
+Well the notion of a pure function is the same as the notion of a
+mathematical function, this means that each function should be only a
+one to one relationship between two given sets.
+
+Some examples are:
+
+``` javascript
+
+
+   const add = (x, y) => x +y; // not curried version
+  
+   const curried_add = x => y => x + y; // curried version
+  
+   const isEven = x => x % 2 == 0;
+```
+
+As you've probably noticed, pure functions are just like macros, and
+they can only have one argument after being curried. Also, since the
+data mutation is not allowed, and since our functions are considered
+just like any other data type, we have to declare them as const.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What is the currying process ?
+
+The currying process aims to make every function that has multiple
+arguments as a function that only takes one argument, and we can achieve
+such a result by making the outer function return a chain of inner
+functions that get executed in the order of their declaration.
+
+Example:
+
+``` javascript
+
+
+   const curried_add = x => x +y;
+  
+   // is the same with
+  
+  
+   const curried_add_v2 = function (x) {
+              
+               return function (y) {
+                       return x+y;
+                   }
+               }
+
+
+   // we can execute that like following
+  
+   curried_add_v2(1)(2);
+   ---------------- ---
+       ^     ^        
+   first function    second function
+   execution            execution
+  
+
+
+   // also, with this paradigm we can do this things
+  
+   const add1 = curried_add_v2(1);
+  
+  
+   add1(2); // 3;
+  
+   // this is possible, cuz the add1 is actually the return function in the curried_add_v2 declaration with x substituted to 1;
+  
+  
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}

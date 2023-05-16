@@ -1,0 +1,102 @@
+# Let's learn bash process signals & how to use them.
+
+## Ressource:
+
+-   [Youtube video](https://youtu.be/0btsvoSt76M)
+
+------------------------------------------------------------------------
+
+## Introduction
+
+Every process in your machine has a life cycle, it starts with the
+caller invocation, and hopefully ends either by it self or some parent
+process.
+
+In this walktrough we will be focusing on the ending phase of this
+cycle. How is a process terminating, what happens then and what to do to
+properly end our process. It should also be mentioned that this document
+scope is only around Linux - like systems that ships with bash.
+
+First of all, some prerequesits. You need to keep in mind that every
+process has a process id or pid for short, and every process or shell
+process can be terminated by the user or any other foreign entity using
+a signal.
+
+A signal is just a sign given or presented to the running process, in
+order to either stop/suspend/terminate/freeze or may be do something
+else for the time being.
+
+Every signal has a name and a code that is used as an id. Some of the
+most known are:
+
+-   SIGKILL \| -9 ,Kills the process
+-   SIGINT \| -2 ,Interropts the process
+-   SIGTERM \| -15 ,Terminates the process
+
+------------------------------------------------------------------------
+
+## How to emit signals ?
+
+To give or throw a signal to a process you need two things: - the
+process id, or pid - the signal code, or name
+
+Then you only need to properly use the kill command to emit the signal.
+
+``` sh
+
+    # kill process that has a pid of 3827
+
+    kill -9 3827            # kills it with a SIGKILL signal.
+```
+
+------------------------------------------------------------------------
+
+## What happens when you emit a signal to a process ?
+
+There is two possible outcomes depending on the implementation of the
+process. For the following, we will consider our process as if it is a
+bash script, for simplicity sake.
+
+If the bash script does not handle any signal or does not have a way to
+handle the emmited signal, then the caller (bash) will obey to the
+request and terminate the process following the signal nature.
+
+Otherwise, if the script does in fact handle signals, then bash will
+delay the termination request until the handler code in the script
+executes.
+
+So as a developer, you should always handle the terminating signals to
+not leave any marks or side effects, like log files or open
+http/database connection and so on.
+
+------------------------------------------------------------------------
+
+## How to handle the emmited signals ?
+
+Well to do so, you need to use the trap command. This unix command will
+allow you to specify a set of commands that will be executed when a
+particular signal is received.
+
+``` sh
+
+    #! /bin/bash
+
+    # set the trap command for various signals handling
+    trap 'rm requests.log && ufw deny http && ufw deny https' EXIT;        # handles an exit signal
+    trap 'rm requests.log && ufw deny http && ufw deny https' 9;           # handles a kill signal
+    trap 'rm requests.log && ufw deny http && ufw deny https' 15;          # handles a terminate signal
+  
+    # or do it in one line
+    trap 'rm requests.log && ufw deny http && ufw deny https' EXIT 9 15;   # handles the previously named signals
+
+
+    # get server connection
+    ping https://www.some-server.com | tee requests.log                    # log to console and to file
+
+    # post request
+    curl https://www.some-server.com -X POST -H "Content-Type: application/json" -d "{"key":"value"}"
+
+
+    # get a ressrouce
+    wget https://www.some-server.com/data?q=key 
+```

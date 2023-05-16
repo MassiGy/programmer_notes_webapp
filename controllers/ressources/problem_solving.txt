@@ -12,8 +12,8 @@ These steps are essentially :
 	- Ask pricise and consice questions
 	- see the current output, and compare it to the wanted output
 	- tweaks some thing up,
-	- go from generic to specific, by trying your code with number..
-
+	- go from generic to specific.
+	
 2. Break down the problem into small problems, devide and conquer:
 	- isolate sub problems that can be fixed independently
 	- fix one sub problem at the time

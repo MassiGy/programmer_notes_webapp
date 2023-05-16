@@ -1,0 +1,225 @@
+# Let's learn about the javascript asynchronous nature.
+
+## Ressources.
+
+-   [The web developer bootcamp, by Colt
+    STEEL.](https://www.udemy.com/course/the-web-developer-bootcamp)
+-   [JS conf lecture about javascript event
+    loop.](https://youtu.be/8aGhZQkoFbQ)
+
+## Authors:
+
+-   [Massiles Ghernaout.](https://www.github.com/MassiGy)
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Introduction & motivation:
+
+`<br>`{=html}
+
+In this document we will learn about how javascript works, and how it
+does handle long lasting tasks. To do so we will take a step back and
+first learn about the javascript runtime.
+
+Both in Nodejs and the browser, the javascript runtime can be divided
+into sub components. The major ones are:
+
+-   The call stack, this is where function calls are stacked.
+-   The stack & heap, this is where objects & variables are stored.
+-   The node/web APIs components, this is where we find our runtime APIs
+    like fetch in the browser and fs in nodejs.
+-   The callback queue and the microtasks queue, these queues are the
+    ones that hold the tasks that will be executed.
+-   The event loop, this is the engine that adds tasks to the call
+    stack.
+
+So when we say that javascript is single threaded, what we mean is that
+javascript only has one call stack. But the runtime environment of
+javascript can, in fact, do multiple things at the same time, since for
+instance the call stack and the web APIs are not managed by the same
+processes. The call stack is executed by javascript, and the web APIs by
+the browser.
+
+To really understand this, we will explore how javascript implements
+this non-blocking behavior.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## How does javascript implement non-blocking behavior with a single thread of execution ?
+
+`<br>`{=html}
+
+As we've already seen, the runtime of javascript contains multiple
+components, so how does it all work together?
+
+To answer that question, we will take advantage of an example. The code
+snippet below will be our little javascript code to analyze.
+
+`<br>`{=html}
+
+``` js
+
+   console.log("one");
+ 
+   setTimeout(()=>{
+       console.log("two");
+   }, 2000);
+
+
+   console.log("three");
+
+
+```
+
+`<br>`{=html}
+
+This code exemple is very classical when it comes to explaining how the
+asynchronous nature of javascript kicks in.
+
+If we think sequentially, the prints should be in the right order ("one"
+\> "two" \> "three"). But the actual order of execution is "one" \>
+"three" \> "two".
+
+To get this, we need to understand how javascript executes code. To do
+so, let's say that the execution started and the first print gets to be
+executed. Each time javascript arrives at an instruction, it checks
+whether it is time consuming or not. If it is not, it gets executed
+directly, otherwise, it gets delegated to the runtime until its
+preparation is done. But how does javascript knows if something is time
+consuming ?
+
+Well, javascript can figure out that by looking at the invoked function.
+If it happens to be a `fetch` or a `setTimeout` or any other web/nodejs
+APIs, then javascript immediately marks it as time consuming and hands
+it over to the runtime.
+
+The `console.log` statement happens to be a very quick instruction, so
+javascript executes it directly. The `setTimeout` is handed over to the
+browser, meanwhile the third `console.log` gets executed. Then after two
+seconds, the browser notifies javascript that the timeout is up, and
+pushes the remaining `console.log` to the tasks queue.
+
+So basically, javascript is indeed single threaded, but it can delegate
+tasks to its runtime environment, that is why it seems to be
+multithreaded even if it is not.
+
+Besides that, as we've mentioned, the runtime contains an even loop and
+multiple task queues. The event loop is the intermediary agent between
+the web/nodejs APIs and the javascript call stack. Each time javascript
+delegates a task to the browser for exemple, this one prepares it behind
+the scenes. When it is done, it pushes back the task to one of the
+queues. The event loop will manage the rest to eventually pass it to the
+javascript call stack.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## Why & How to await for an asynchronous code ?
+
+`<br>`{=html}
+
+Now that we've seen how javascript asynchronous nature works, we will
+discover why & how to use them in our code.
+
+The reason why you probably want to stick to asynchronous javascript is
+performance, by letting javascript handle the tasks you will get the
+best overall performance.
+
+But sometimes you really need to wait for something to continue. Maybe
+you are querying the database before sending a response, or you might be
+fetching data from a server to show something on the page. In these
+situations, you need to block the javascript code execution until a task
+is done.
+
+To do so, multiple strategies were invented. First, there was callback
+chaining & nesting, but developers quickly got rid of it since it led to
+callback hell. Then, in ES6, javascript added promises that allowed us
+to chain `.then` methods instead of nesting callbacks. This was better
+but not best. Finally, javascript came with `async/await` keywords, that
+basically works with promises behind the scenes, but it really abstract
+away all the `resolve/reject` stuff to make it more readable and
+maintainable.
+
+So nowadays, if we want to `await` for a task inside of a function, all
+we need is to make this function `async` and then add `await` in front
+of each task that needs to be done before continuing the rest of the
+function code.
+
+This code snippet showcases how to do so. `<br>`{=html}
+
+``` js
+
+
+
+
+   async function render(){
+
+
+       // wait for the server response
+       const response = await fetch("someserver.com/data");
+
+
+       // transform the response to json data.
+       const data = await response.json();
+
+
+       // consume the data
+       console.log(data);
+
+
+
+
+       // return data
+       return data;
+
+
+   }
+
+```
+
+`<br>`{=html}
+
+As you can see, `async/await` makes handling tasks that are time
+consuming much easier. In fact, when a function is set as `async`, it
+automatically returns a promise that resolves with the returned value or
+undefined if no `return` is set. So technically, you can chain a `.then`
+callback to access the data. The following code snippet showcases how to
+do so.
+
+``` js
+
+
+   render()
+       .then(data => console.log("print from the .then:"+ data));      // data = returned value of render()
+
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## Best way to use async/await in our javascript code ?
+
+`<br>`{=html}
+
+Now that we have a clearer understanding of javascript asynchronous
+nature, and how to break that to await a task, we will list some rules
+to follow.
+
+-   Only await tasks that are needed in the following code.
+-   If two or more tasks need to be awaited but neither of those needs
+    to be done after another one, consider using `Promise.all` to run
+    them in parallel.
+-   Consider using lazy loading animations if your database requests are
+    taking too much time, or even limit the number of queries or data to
+    be fetched at a row. Thus even if you await them, it won't take too
+    much time.

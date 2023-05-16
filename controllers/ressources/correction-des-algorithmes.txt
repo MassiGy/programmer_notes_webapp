@@ -1,0 +1,69 @@
+# Correction des algorithmes.
+
+## Ressources:
+
+-   [Cours sur
+    youtube.](https://youtu.be/VlPWLPXVcww?list=PLIWAJJ_34WSstnXWiDPWYaQekiDc75sRp)
+
+------------------------------------------------------------------------
+
+## Introduction.
+
+La correction des algorithmes à pour optique de s'assurer/prouver de
+manière mathématique, donc rigoureuse, la correction d'un certain
+algorithme.
+
+La motivation est le fait que tester un algorithme avec des exemples
+peut ne pas être suffisant dans certaines situations. Dès lors, si notre
+algorithme est sujet à une tension ou un environnement où l'erreur est
+coûteuse, on doit plutôt utiliser l'outil mathématique pour l'analyser.
+
+La correction d'un algorithme se compose de deux notions/parties. La
+première est la finitude/terminaison, c'est de vérifier que notre
+algorithme se termine. Puis, la deuxième c'est de trouver un invariant
+au cours de l'exécution de notre algorithme et qui mène vers le bon
+résultat à la fin de celui-ci.
+
+Enfin, on dit que notre algorithme est correct si et seulement si il se
+termine et l'invariant défini indique le bon résultat à la fin de
+l'exécution.
+
+------------------------------------------------------------------------
+
+## Finitude/Terminaison d'un algorithme:
+
+La finitude/terminaison d'un algorithme est le fait de dire/prouver que
+notre algorithme se termine ou non. Pour bien arriver à cette
+conclusion, on doit prouver que lors de son l'exécution on s'approche de
+plus plus de la fin. Cela reste théorique mais le concept est néanmoins
+valide.
+
+Un exemple est de dire que lors d'un parcours sur un vecteur avec une
+boucle, la terminaison du parcours peut être marquée par
+l'incrémentation du nombre d'éléments visités.
+
+------------------------------------------------------------------------
+
+## Notion d'invariant:
+
+L'invariant est un postulat/hypothèse/proposition mathématique qui ne
+varie pas au fur et à mesure que notre algorithme s'exécute. Il
+constitue souvent une relation entre les variables locales et l'ensemble
+de données passé en paramètre.
+
+Une fois qu'on a trouvé notre invariant, il faut s'assurer de ceci: - Il
+faut vérifier que notre invariant est de valeur constante ( ne varie pas
+). - Il faut vérifier que la relation/hypothèse/proposition qu'il
+reflète est correcte au début de l'algorithme. - Il faut vérifier que la
+relation/hypothèse/proposition qu'il reflète reste correcte d'une étape
+à la suivante . - Il faut vérifier que la relation/hypothèse/proposition
+qu'il reflète est correcte à la fin de l'algorithme. - Il faut vérifier
+que la relation/hypothèse/proposition qu'il reflète est conforme au
+résultat attendu à la fin de l'algorithme.
+
+On remarque que ces assertions ressemblent fortement à celles du
+raisonnement par récurrence.
+
+Enfin, si on arrive à prouver que ces assertions sont valides, alors on
+peut déduire que notre invariant est correct, de même pour notre
+algorithme.

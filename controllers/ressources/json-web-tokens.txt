@@ -1,0 +1,614 @@
+# Let's learn about json web tokens.
+
+**It will be helpful to read the
+[auth-and-authorization.md](https://gist.github.com/MassiGy/8b86b92d787d456ad58fc30cf87970bd)
+first.**
+
+## Ressources.
+
+-   [Ben Awad.](https://youtu.be/dgg1dvs0Bn4)
+-   [Fireship.](https://youtu.be/UBUNrFtufWo)
+-   [Medium blog
+    post.](https://medium.com/devgorilla/how-to-log-out-when-using-jwt-a8c7823e8a6)
+
+## Authors:
+
+-   [Massiles Ghernaout.](https://www.github.com/MassiGy)
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## Introduction & motivation:
+
+JSON Web Tokens are a modern way for implementing authentication &
+maintaining state on the subsequent request/response cycles. This new
+strategy came to solve problems that arose with the growth of
+microservices architecture & single page web apps built with modern
+frameworks like React/Vue.
+
+As we've seen in the [authentication and authorization
+guide](https://gist.github.com/MassiGy/8b86b92d787d456ad58fc30cf87970bd),
+session are a server side solution to implement authentication. However,
+when using sessions we need to find & set up a database store where our
+sessions will be kept. This is fine if we only aim to use one server &
+limit our load, but it is usually not the case.
+
+The issue is that microservices architecture is all about managing
+multiple instances of the same server, so server side session based
+authentication is not the way to go. That is because trying to also
+distribute the database stores that hold our sessions is quite complex.
+
+Besides that, single page web apps are built with speed in mind and
+using jwt is a big plus, since these can hold much more data than
+cookies which translates to less API calls.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## What are json web tokens (jwt) ?
+
+`<br>`{=html}
+
+Json web tokens are just like sessions but formatted in json & held in
+the client side (client browser). Similar to cookies they can be
+transmitted back & forth between the user and the server. Each time the
+server receives a request that ships with a jwt, it will verify its
+signature using a locally stored secret key.
+
+So this completely removes the problem of session store since now the
+jwt are stored in the client side & verified before use by the server.
+
+Also, since json web tokens can hold more data, web apps can cache the
+data to minimize the api calls count. This leads to better
+responsiveness & overall performance.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## A couple of things to remember before using json web tokens ?
+
+`<br>`{=html}
+
+Besides the points that we've already listed above, another thing to
+keep in mind is that Json web tokens just like cookies can be hijacked.
+
+Also, since they share the same nature of cookies and the server only
+verifies them, there is no way of revoking a jwt if the max age is not
+yet reached. So if the user loses control of his account & contacts the
+service provider to revoke his account, the server has no way to block
+the hacker that uses that user jwt until the max age is met. (since it
+only verifies its signature.)
+
+***Notes: keep in mind that signing is not encrypting, so do not send
+personal credentials as jwts, since anyone can decode it & get the data,
+that is how modern web apps use them too.***
+
+The underlying idea is that replacing sessions with jwt limits our
+capabilities upon user activity.
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## How to implement jwt ?
+
+`<br>`{=html}
+
+In this guide we will use Express.js to implement a backend that uses
+json web tokens. To do so we need to first install the related package.
+
+`<br>`{=html}
+
+``` sh
+
+
+   npm install express jsonwebtoken
+
+```
+
+`<br>`{=html}
+
+Since that is done, we can now go & import it in our server script.
+
+`<br>`{=html}
+
+``` js
+
+
+   const express = require("express");
+   const app = express();
+   const jwt = require("jsonwebtoken")
+
+```
+
+`<br>`{=html}
+
+Now that we've imported the json web token, we're pretty much done on
+the configuration process. What remains is to use them. To do so, we
+will go through the authentication cycle.
+
+Here we will briefly showcase the difference between session based and
+jwt based authentication.
+
+`<br>`{=html}
+
+### **Sign up:**
+
+`<br>`{=html}
+
+This code snippet below showcases how jwt replaces the sessions.
+
+`<br>`{=html}
+
+``` js
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+
+
+
+
+   module.exports.register = async(req,res) => {
+      
+       // data validation
+       ...
+      
+
+
+
+
+      
+       // hash the password
+       const salt = bcrypt.genSaltSync(12);
+       const hash = bcrypt.hashSync(String(typedInfo.password), salt);
+      
+       typedInfo.password = hash;
+
+
+
+
+       // save the new user object
+       const newUser = new User({typedInfo});
+       newUser.save();
+
+
+
+
+
+
+
+
+       // create a jwt using the user info
+       const token = jwt.sign(
+               {id: newUser._id, username: newUser.username, email: newUser.email},
+               String(process.env.TOKEN_SIGNING_SECRET),
+               {expiresIn: 1 * 24 * 60 * 60}       // one day max age
+           );
+
+
+
+
+       // send the token as a response.
+       /**
+        * This will not only send a response but also tell express (and the browser) to attach it to the
+        * subsequent request objects.
+       */
+       return res.json({
+           msg: "Successfully signed in.",
+           token: token
+       });
+ 
+   }
+
+
+
+```
+
+`<br>`{=html}
+
+Now that we've seen how jwt replaces server side sessions, we will
+discover how to use them to complete the authentication cycle.
+
+`<br>`{=html}
+
+### **Accessing a ressource via json web tokens:**
+
+`<br>`{=html}
+
+In this process, we need to make sure that the transmitted token is
+actually signed by our server (using the signing key). Since the token
+is added to the request header, we first need to extract it and attach
+it to the req object as a property. To do so, we will create a
+middleware that can be called before the controller.
+
+The code snippet below showcases how to do so.
+
+`<br>`{=html}
+
+``` js
+
+
+   /*
+       The header that contains the token is formatted as:
+
+
+       "Authorization":"Bearer <token>"
+   */
+
+
+   module.exports.getTokenFromHeaders = (req,res,next)=>{
+      
+       // access the right header
+       const bearerHeader = req.headers["Authorization"];
+
+
+
+
+       // split the header content to get the token
+       const token = bearerHeader.split(" ")[1];
+
+
+       // attach the token as a property to the req object
+       if(token?.length) req.token = token;
+       else req.token = null;
+
+
+
+
+       // call next to move on
+       next();
+   }
+
+
+
+```
+
+`<br>`{=html}
+
+Now that our token is attached to the req, we can go ahead and write our
+authentication middleware, this will verify the token and check whether
+the user is allowed to proceed. So this middleware should be called
+after the token extraction.
+
+`<br>`{=html}
+
+``` js
+
+
+   module.exports.isAllowed = (req,res, next)=>{
+       jwt.verify(
+           req.token,
+           String(process.env.TOKEN_SIGNING_SECRET),
+           (err, token_payload)=> {
+
+
+               if(err){
+                   req.token_payload = null;
+                   return res.statusCode(403).send("Forbidden, the token is deprecated.");
+               }
+
+
+               req.token_payload = token_payload;      // add to req object to not verify it again (performance)
+               return next();
+           }
+       )
+   }
+
+```
+
+`<br>`{=html}
+
+If we pass, we know that the user is legit and can proceed. Obviously,
+if he aims to mutate data, we need to make sure that he is authorized,
+which means that he owns the data. The following code snippet showcases
+how to do so.
+
+`<br>`{=html}
+
+``` js
+
+
+
+
+   const Post = require("../Modals/Post");
+
+
+
+
+   module.exports.editPost = async(req,res)=>{
+
+
+       // recheck that the token_payload is on the req object
+       if(!req.token || !req.token_payload)
+           return res.statusCode(403).send("Forbidden, not allowed to proceed.");
+      
+      
+       // validate the user data;
+       ...
+
+
+
+
+
+
+
+
+       // query the post info.
+       const post = await Post.findOneById({id: req.body.post_id});
+
+
+
+
+
+
+
+
+       // make sure that the user is authorized.
+       if(req.token_payload.id != post.author_id)
+           return res.statusCode(401).send("Not authorized.");
+
+
+
+
+
+
+       // continue and edit the post
+       ...
+
+
+
+
+
+
+       // inform the user for the edit
+       return res.send("Post successfully edited.");
+
+
+   }
+
+
+
+```
+
+`<br>`{=html}
+
+Now that the overall workflow of user authorization is set up, we will
+continue on implementing the other pillars of authentication. What
+remains is login, logout and sign out.
+
+`<br>`{=html}
+
+### **Login:**
+
+`<br>`{=html}
+
+``` js
+
+
+
+
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+  
+
+
+
+
+   module.exports.login = async(req,res) => {
+
+
+
+
+       // validate the user data
+       ...
+
+
+
+
+       // get the user information from the database
+       const userInfo = await User.findOne({username});
+
+
+
+
+       // make sure that the user typed info is the same as the storedInfo
+       const data_valid = userInfo.username == typedInfo.username;
+
+
+
+
+       const hashed_password = userInfo.password;
+       const is_password_same_as_hash = bcrypt.compare(typedInfo.password, hashed_password);
+
+
+       data_valid = data_valid && is_password_same_as_hash;
+
+
+
+
+       if(data_valid)
+       {
+
+
+           // create a jwt using the user info
+           const token = jwt.sign(
+               {id: userInfo._id, username: userInfo.username, email: userInfo.email},
+               String(process.env.TOKEN_SIGNING_SECRET),
+               {expiresIn: 1 * 24 * 60 * 60}       // one day max age
+           );
+
+
+           // send the token as a response.
+           /**
+            * This will not only send a response but also tell express (and the browser) to attach it to the
+            * subsequent request objects.
+           */
+           return res.json({
+               msg: "Successfully logged in.",
+               token: token
+           });
+          
+       } else {
+
+
+           // redirect to the login page
+           return res.send("Invalid credentials.");
+       }
+   }
+
+
+
+
+
+```
+
+`<br>`{=html}
+
+### **Logout:**
+
+`<br>`{=html}
+
+While using json web tokens, we give up some capability regarding the
+management of user activity. In the server side sessions strategy,
+logout was simple. It was only about disconnecting the session from the
+req/res cycle.
+
+Here with jwt, to logout the user it is quite complex, few solutions
+goes as follows:
+
+-   We can wait until the token expires.
+-   If the token is not expired on logout, we can add it to a blacklist,
+    then add a middleware to check in every subsequent request whether
+    the token is blacklisted.
+-   You can inform the user to remove the cookies/free the cache related
+    to your web app.
+-   If you have a well elaborated front end, you can remove the token
+    with client side javascript when the user asks for logout.
+
+As you can see, giving up some control over user activity can be a big
+drawback, to minimize the cost, always make your tokens max age as small
+as possible. (not too small, otherwise UX will not be great.)
+
+`<br>`{=html}
+
+### **Sign out:**
+
+`<br>`{=html}
+
+In the signout process, we also lack the ability to remove the jwt, so
+we are only able to remove the user data in our database.
+
+To actually make the user signout & logout, we need to either wait for
+the token expiration date, or remove it from the frontend, or even
+further blacklist it in the backend.
+
+The code below only showcases how signout needs to be done.
+
+`<br>`{=html}
+
+``` js
+
+
+
+
+   const User = require("../Modals/User");
+   const bcrypt = require("bcryptjs");
+
+
+   module.exports.signout = async(req,res) => {
+
+
+
+
+       // validate the user typed data
+       ...
+
+
+
+
+       // get the user information from the database
+       const userInfo = await User.findOne({username});
+
+
+
+
+       // make sure that the user typed info is the same as the storedInfo
+       const data_valid = userInfo.username == typedInfo.username;
+
+
+
+
+       const hashed_password = userInfo.password;
+       const is_password_same_as_hash = bcrypt.compare(typedInfo.password, hashed_password);
+
+
+
+
+       data_valid = data_valid && is_password_same_as_hash;
+
+
+
+
+       if(data_valid)
+       {
+          
+           /**
+           * Here you can either blacklist the token or do nothing & wait for its expiration.
+           * */
+
+
+
+
+           // & inform the user
+           return res.send("Successfully signout.");
+          
+       } else {
+
+
+           // redirect to the login page
+           return res.send("Invalid credentials.");
+       }
+   }
+
+```
+
+`<br>`{=html}
+
+------------------------------------------------------------------------
+
+## Recap:
+
+`<br>`{=html}
+
+To sum up, jwt based authentication is very helpful in distributed
+systems, but they come with their drawbacks.
+
+Some rules to keep in mind are:
+
+-   Make the expiration date as small as possible.
+-   Only use jwt in a system where logouts & signouts are not frequent.
+-   Make the frontend delete the tokens on logout & signout.
+-   If needed, you can implement a blacklist with a database store.
+
+------------------------------------------------------------------------
+
+`<br>`{=html}
+
+## Useful features based on jwt:
+
+`<br>`{=html}
+
+-   As we've seen there is authentication/authorization.
+-   Email address validation.

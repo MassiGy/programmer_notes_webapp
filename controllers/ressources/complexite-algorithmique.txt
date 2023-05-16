@@ -1,0 +1,106 @@
+# Complexité temporelle et spatiale des algorithmes
+
+## Ressource:
+
+-   [Cours sur
+    youtube](https://www.youtube.com/watch?v=rf9TpGjapjE&list=PLIWAJJ_34WSstnXWiDPWYaQekiDc75sRp&index=7&ab_channel=Aur%C3%A9lieLagoutte-Universit%C3%A9ClermontAuvergne)
+
+------------------------------------------------------------------------
+
+## Introduction
+
+Tout d'abord, nous allons discuter pourquoi le fait d'apprendre une
+méthodologie pour évaluer la complexité temporelle et spatiale est
+important.
+
+Soit un algorithme *`A`*, et deux étudiants avec leurs propres machines.
+Étant des machines différentes, elles ont forcément des capacités
+d'exécution ou bien des performances différentes.
+
+Lors de l'exécution du même algorithme, pour le même ensemble de données
+en entrée, les étudiants voient que les temps d'exécution sont
+différents.
+
+À partir de cette petite expérience, on peut constater que l'étude ou
+bien la mesure de l'exécution d'un algorithme ne doit pas dépendre de
+son environnement. C'est pour cela, que les notions de complexité
+temporelle et spatiale sont développées et de nos jours indispensables.
+
+Ces deux notions se concentrent sur l'exécution de l'algorithme en
+prenant en compte que l'algorithme lui-même et ce qui le construit. Pour
+bien comprendre ce qui suit, nous allons définir quelques notions de
+vocabulaire.
+
+Un algorithme est une suite d'instructions, et chacune d'entre elles est
+une suite d'opérations. Une opération peut être aussi décomposée à un
+tel point ou elle devient une opération élémentaire. Chaque opération
+élémentaire à un certain temps d'exécution qui est son coût temporel et
+aussi un coût spatial. Plus important encore, le coût de chaque
+opération élémentaire est considéré comme absolu/partagé à travers les
+environnements d'exécution.
+
+Par conséquent, pour avoir une étude indépendante de l'environnement, il
+faut se concentrer sur les opérations élémentaires qui forment
+l'algorithme en question.
+
+D'ailleurs, la complexité temporelle est l'étude du coût en term de
+temps de toutes les opérations élémentaires qui constituent l'algorithme
+*`A`* en fonction de *`N`* le nombre/quantité de données entrées. Même
+postulât pour la complexité spatiale.
+
+------------------------------------------------------------------------
+
+## Comment calculer la complexité d'un algorithme ?
+
+Maintenant qu'on comprend c'est quoi la complexité, nous allons définir
+la méthodologie pour sa mesure ou bien son calcul.
+
+On a: - *`A`* notre algorithme. - Soit *`N`* le nombre/quantité/taille
+de l'ensemble des données entrées. - Soit *`K`* le nombre d'opérations
+élémentaires lors d'une exécution de l'algorithme *`A`*.
+
+La mesure/calcul de la complexité revient à trouver la fonction
+mathématique qui décrit la croissance de *`K`* vis à vis de *`N`*.
+
+La complexité des algorithmes étant une étude très employée et utilisée,
+certains standards ont étaient déjà définis. Cela veut dire que
+certaines fonctions qui décrivent la croissance de *`K`* vis à vis de
+*`N`* ont étaient définies. Tout comme l'illustre l'image ci-dessous.
+
+![image qui décrit les courbes/fonction de la complexité des
+algorithmes](./classes-de-complexite.png)
+
+#### Conclusion:
+
+Pour trouver la complexité d'un algorithme donné, il faut trouver la
+fonction qui décrit la croissance du nombre d'opérations élémentaires
+vis-à-vis de la croissance de la taille/largeur/quantité de l'ensemble
+de données en entrée.
+
+------------------------------------------------------------------------
+
+## Cas spéciaux de la complexité:
+
+Jusqu'à maintenant nous avons abordé la complexité dans sa globalité,
+mais il faut aussi savoir qu'elle se décompose en trois cas
+particuliers.
+
+Ces cas particuliers dépendent du degré auquel l'ensemble des données
+passées en entrées sont favorables pour notre algorithme.
+
+Si les données entrées sont favorables, on dit que la complexité mesuré
+reflète le meilleur cas. Si les données entrées sont moyennement
+favorables, on dit que la complexité mesuré reflète le cas courant ou
+moyen. Si les données entrées sont défavorables, on dit que la
+complexité mesuré reflète le pire cas.
+
+En pratique et dans l'environnement professionnel, on s'intéresse qu'à
+la complexité au pire cas, car elle définit une sorte de limite pour le
+temps/espace nécessaire à l'exécution.
+
+Une autre notion/pratique est de s'assurer que la structure de données
+passée en entrée à notre algorithme est la plus optimisée pour celui-ci.
+C'est pour cela que les cours d'algorithmique sont accompagnés de cours
+sur les structures de données.
+
+------------------------------------------------------------------------

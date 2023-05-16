@@ -1,4 +1,4 @@
-printf is one of the most used functions in the C programming language, and the most intressting ones also.
+printf is one of the most used functions in the C programming language, and one of the most intressting ones also.
 
 the thing that makes printf so intresting is it prototype, it can take from 1 argument all the way up to 100 if the caller wanted to, or in theory it can goes to infinity (as long as your memory can hundel them).
 
