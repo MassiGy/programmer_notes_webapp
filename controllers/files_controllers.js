@@ -55,14 +55,15 @@ module.exports.render_file_content = (req, res) => {
 
 /** These are only for the /legacy routes */
 
-module.exports.upload_file = (req, res) => {
-    res.redirect("/");
+module.exports.upload_file = (req, res) => {    
+    res.redirect(`/${res.locals.mode}`);
 };
 
 module.exports.delete_file = (req, res) => {
+    
     fs.unlink(`./controllers/ressources/${req.body.file_to_delete}`, function (err) {
         if (err) return res.status(404).send("file not found");
-        res.redirect("/");
+        res.redirect(`/${res.locals.mode}`);
     })
 }
 
