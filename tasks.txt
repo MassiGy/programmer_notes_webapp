@@ -9,3 +9,38 @@ Tasks:
 5. Create an implementation that will allow the admin to delete file. (done)
 6. Create a search engine with a full text search implementation using redis (caching principle). (redis-om is not well established yet)
 7. Create a stripe.js implementation that will allow generous users to send me some credit. (do this after launch)
+
+
+
+UPDATE: (May 2023)
+
+- Replace the middleware that adds the file name to res.locals with a session based storage, to gain performance & also make sure that 
+the session changes only after some age.
+
+
+- Make this application work with github gits instead of text files.
+
+To do so, I want to have both systems in the same api.
+
+/legacy for text files
+/new    for github gists
+
+So for all the present controllers, I need to map them to /legacy routes
+
+Then I need to create new controllers to follow the new gists modal.
+
+
+The idea is to request a list of my personal github gits, & then when a user goes to view them, we just embbed the 
+corresponding gits to the page.
+
+
+to embbed a gist you need to add a script tag like this :
+
+<script src="https://gist.github.com/MassiGy/df85af742b60b1f115b08b64fc35e61c.js"></script>
+
+
+The above script can be also constructed by querying the github api, and then adding .js extension to the html_url.
+
+github gists api: https://api.github.com/users/MassiGy/gists            | replace MassiGy by your username.
+
+html_url: https://gist.github.com/MassiGy/df85af742b60b1f115b08b64fc35e61c
