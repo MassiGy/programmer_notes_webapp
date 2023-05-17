@@ -22,7 +22,7 @@
           <header class="major">
             <h2>Programmer Notes</h2>
           </header>
-          <span class="image main"><img src="images/@MassiGy.png" alt="" /></span>
+          <span class="image main"><img src="/images/@MassiGy.png" alt="" /></span>
           <hr class="major" />
 
 
@@ -45,21 +45,38 @@
                 </form>
               </ul>
             </article>
-            <% for (let file of files){ %>
-            <article>
-              <u>
-                <h3>
-                  <a href="/files/<%= file.file_name %>">Read : <%= file.file_name %></a>
-                </h3>
-              </u>
-              <p><%= file.sample_text %> </p>
-              <ul class="actions">
-                <form action="/files/<%= file.file_name%>" method="post">
-                  <li><button class="button">Get <%= file.file_name %> </button></li>
-                </form>
-              </ul>
-            </article>
+            <article></article>
+              <% if (mode == "legacy"){ %>
+                  <% for (let file of files){ %>
+                  <article>
+                    <u>
+                      <h3>
+                        <a href="/files/<%= file.file_name %>">Read : <%= file.file_name %></a>
+                      </h3>
+                    </u>
+                    <p><%= file.sample_text %> </p>
+                    <ul class="actions">
+                      <form action="/legacy/files/<%= file.file_name%>" method="post">
+                        <li><button class="button">Get <%= file.file_name %> </button></li>
+                      </form>
+                    </ul>
+                  </article>
+                  <% } %>
+              <% } %>
+
+              <% if (mode == "new"){ %>
+                <% for (let gist of gists){ %>
+                <article>
+             
+                    <h3>
+                      <a href="/new/files/<%= gist.gist_name %>">Read : <%= gist.gist_name %></a>
+                    </h3>
+               
+                </article>
+                <% } %>
             <% } %>
+              
+
           </div>
         </section>
 

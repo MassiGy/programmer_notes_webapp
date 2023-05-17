@@ -24,22 +24,26 @@
 
         <!-- Content -->
         <section>
-          <header class="main">
-            <h1>Learn with <%= data.title %> </h1>
-          </header>
-
-          <hr class="major" />
-          <p>
-            <%- data.content %>
-          </p>
-
-          <hr class="major" />
-          <ul class="actions">
-            <form action="/files/<%= data.title%>" method="post">
-              <li><button class="button">Get <%= data.title %> </button></li>
-            </form>
-          </ul>
+            <header class="main">
+              <h1>Learn with <%= data.title %> </h1>
+            </header>
+            
+            <hr class="major" />
+            <p>
+              <%- data.content %>
+            </p>
+          
+             <% if (mode == "legacy"){ %>
+                <hr class="major" />
+                <ul class="actions">
+                  <form action="/legacy/files/<%= data.title%>" method="post">
+                    <li><button class="button">Get <%= data.title %> </button></li>
+                  </form>
+                </ul>
+              <% } %>
         </section>
+
+
 
       </div>
     </div>

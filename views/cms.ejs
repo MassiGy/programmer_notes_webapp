@@ -32,7 +32,7 @@
 
 
             <h2>Upload Form</h2>
-            <form method="post" action="/files" enctype="multipart/form-data">
+            <form method="post" action="/legacy/files" enctype="multipart/form-data">
               <div class="row gtr-uniform">
                 <div class="col-12">
                   <input type="file" name="uploaded_files" multiple id="demo-name" value="" placeholder="txt file" />
@@ -53,7 +53,7 @@
             </form>
 
             <h2>Delete Form</h2>
-            <form method="post" action="/files?_method=DELETE">
+            <form method="post" action="/legacy/files?_method=DELETE">
               <div class="row gtr-uniform">
                 <div class="col-12">
                   <input type="text" name="file_to_delete" multiple id="demo-name" value="" placeholder="txt file name" />

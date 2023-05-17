@@ -1,17 +1,7 @@
 <div id="sidebar">
   <div class="inner">
 
-    <!-- Search -->
-    <section class="alt">
-      <form action="/files/search" method="post" id="search">
-        <input type="text" name="query" id="query" placeholder="Search" list="file_suggestions" />
-        <datalist id="file_suggestions">
-          <!-- in here we will append option through the search_input.js script -->
-        </datalist>
-
-      </form>
-    </section>
-
+    
     <!-- Menu -->
     <nav id="menu">
       <header class="major">
@@ -22,9 +12,18 @@
         <li>
           <span class="opener">Ressources</span>
           <ul>
-            <% for(let file of file_names){ %>
-            <li><a href="/files/<%= file %> "><%= file %> </a></li>
+            <% if(mode == "legacy"){ %>
+                <% for(let file of file_names){ %>
+                <li><a href="/legacy/files/<%= file %> "><%= file %> </a></li>
+                <% } %>
             <% } %>
+            
+            <% if(mode == "new"){ %>
+                <% for(let gist of gists){ %>
+                <li><a href="/new/files/<%= gist.gist_name %> "><%= gist.gist_name %> </a></li>
+                <% } %>
+            <% } %>
+            
           </ul>
       </ul>
     </nav>
