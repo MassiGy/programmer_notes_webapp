@@ -11,7 +11,8 @@ const port = process.env.PORT || 8000;
 const methodOverride = require("method-override");
 const compression = require("compression");
 const helmet = require("helmet");
-
+const session = require("express-session");
+const sessionFileStore = require("session-file-store")(session);
 
 // import our route hundlers
 const file_routes = require("./routes/files_routes");
@@ -38,19 +39,43 @@ app.use(compression());
 app.use(helmet());
 
 
+app.use(session({
+    name: String(process.env.SESSION_NAME),
+    secret: String(process.env.SESSION_SECRET),
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 50 * 1 * 24 * 60 * 60 * 1000, // recreate every 50days, since ressources do not change often
+        path: "/"
+    }
+}));
+
+
+
 
 app.use((req, res, next) => {
+
+    // only create the session if its not already created or outdated.
+    if (req.session && req.session.file_names?.length && req.session.files?.length) {
+        
+        res.locals.files = req.session.files;
+        res.locals.file_names = req.session.file_names;
+        return next();
+    }
+    
+  
     // find all the file names
-    res.locals.file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
+    req.session.file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
         if (err) res.status(500).send("Ressources can not be found!");
         return files;
     });
-    // Delete the Guide file to not be rendred twice (look to the view)
-    res.locals.file_names.splice(res.locals.file_names.indexOf("Guide.txt"),1);
-    res.locals.files = [];
 
-    res.locals.file_names.forEach((file) => {
-        res.locals.files.push({
+    // Delete the Guide file to not be rendred twice (look to the view)
+    req.session.file_names.splice(req.session.file_names.indexOf("Guide.txt"), 1);
+    req.session.files = [];
+
+    req.session.file_names.forEach((file) => {
+        req.session.files.push({
             file_name: file,
             sample_text: fs.readFileSync(
                 `./controllers/ressources/${file}`,
@@ -60,16 +85,25 @@ app.use((req, res, next) => {
                     return file_content;
                 }).toString().substring(0, 70).concat("...")
         })
-    })
+    });
+
+    res.locals.files = req.session.files;
+    res.locals.file_names = req.session.file_names;
     next();
 })
 
 
 
 // activate our imported routes
-app.use("/files", file_routes);
-app.use("/cms", cms_routes);
-app.use("/", other_routes);
+
+
+// legacy api routes - text files based
+app.use("/legacy/files", file_routes);
+app.use("/legacy/cms", cms_routes);
+app.use("/legacy", other_routes);
+
+
+// new api routes   - github gists based
 
 
 
