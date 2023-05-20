@@ -76,11 +76,9 @@ app.use(async (req, res, next) => {
 
 
     // only create the session if its not already created or outdated.
-    if (req.session.file_names?.length && req.session.files?.length && req.session.gists?.length) {
+    if (req.session.file_names?.length  && req.session.gists?.length) {
 
-        res.locals.files = req.session.files;
         res.locals.file_names = req.session.file_names;
-
         res.locals.gists = req.session.gists;
 
         return next();
@@ -96,20 +94,8 @@ app.use(async (req, res, next) => {
 
     // Delete the Guide file to not be rendred twice (look to the view)
     req.session.file_names.splice(req.session.file_names.indexOf("Guide.txt"), 1);
-    req.session.files = [];
-
-    req.session.file_names.forEach((file) => {
-        req.session.files.push({
-            file_name: file,
-            sample_text: fs.readFileSync(
-                `./controllers/ressources/${file}`,
-                "utf-8",
-                function (err, file_content) {
-                    if (err) return "file content is empty or can not be accessed.";
-                    return file_content;
-                }).toString().substring(0, 70).concat("...")
-        })
-    });
+   
+  
 
 
 
@@ -122,11 +108,6 @@ app.use(async (req, res, next) => {
             gist_name: Object.values(el.files)[0].filename,
         };
     })
-
-
-
-
-
 
     res.locals.gists = req.session.gists;
     res.locals.files = req.session.files;
