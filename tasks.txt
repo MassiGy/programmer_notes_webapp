@@ -12,13 +12,13 @@ Tasks:
 
 
 
-UPDATE: (May 2023)
+UPDATE: (17th May 2023)
 
 - Replace the middleware that adds the file name to res.locals with a session based storage, to gain performance & also make sure that 
 the session changes only after some age.
 
 
-- Make this application work with github gits instead of text files.
+- Make this application work with github gists instead of text files.
 
 To do so, I want to have both systems in the same api.
 
@@ -27,12 +27,10 @@ To do so, I want to have both systems in the same api.
 
 So for all the present controllers, I need to map them to /legacy routes
 
-Then I need to create new controllers to follow the new gists modal.
-
+Then I need to create new controllers to follow the new gists modal. ( or tweak the existing ones )
 
 The idea is to request a list of my personal github gits, & then when a user goes to view them, we just embbed the 
-corresponding gits to the page.
-
+corresponding gist to the page.
 
 to embbed a gist you need to add a script tag like this :
 
@@ -44,3 +42,64 @@ The above script can be also constructed by querying the github api, and then ad
 github gists api: https://api.github.com/users/MassiGy/gists            | replace MassiGy by your username.
 
 html_url: https://gist.github.com/MassiGy/df85af742b60b1f115b08b64fc35e61c
+
+
+UPDATE (19th May 2023)
+
+Since the last time, I was using sessions for data persistency. The data contained in the session is not user related, it is 
+just data about the available ressource on the server & the available gists on github. 
+
+I made the session using a cookie named  "webappcontent" that only has an 1 hour max age. This means that every cookie 
+will be expired in an hour of time, this helps me to not overload my file system api or the github api.
+
+This was a very big imporvement since the last time, where we were making requests to the file system on every req/res cycle.
+
+Although the system is better, it has a drawback. The issue is about the session store, I was not able to use the file store as always 
+since it did break my static file rendering (I guess it is a problem due to express static middlewares or the package in itself - @npm/file-session-store);
+
+The update of this time will solve this issue by migrating from session based data persistence to jwt based data persistence. This solves 
+the store issue since they will be on the client browser. Also the jwt will be just for the web app content data as well. So overall the fact that the user might get hijacked won't do any harm (non-confidential data).
+
+UPDATE (19th May 2023)
+
+Since the last time, I tried to implement the json web token strategy but I had some issues:
+
+- I did not have a client side script that catches the token and put it on localStorage, also I did not have the 
+script that adds it to the authorization req header every time the client sends a request.
+
+- I tried to store the token as a cookie since the browser adds them to the req object automatically, but the token 
+due to its format takes too much byte size. (cookies limit are around 4k, and the token exceeded that with my usage )
+
+
+So I ended up with two solutions,
+
+- Implement a session store that uses some kind of a database on the server side (back to the session strategy).
+- find a new way to format my data so as the byte size is smaller and actually send multiple cookies. ( we can have up to 20 cookies per site)
+
+
+Since the first one increases server cost, I went with the second one.
+
+I've reformated my data, and sent three cookies rather then 1. My byte size per cookie went from 4k+ to 600bytes for now.
+
+I have 18 gists on github, and so 600 / 18 ~ 33bytes, which means that every gits costs 33bytes on my cookie size.
+
+Basic math tells me that I can do up to 4000 / 33 ~ 114 gists before the system breaks. 
+
+Also this is actually accurate since github uses 32byte-wide ids. ( +1 byte for our the margin)
+
+
+
+So I have around 2 years of gist writing before this system breaks XD
+
+
+Another solution is to implement the session store, but it takes either a cloud solution like mongoAtlas, or a server side
+hosted solution like memcache/redis. The problem with the server side is that it is rather expensive at long term.
+
+The problem with the cloud solution is that every time the user sends a request I need to fire up a request to that service too.
+At that case why not just fire up a request to github ? ( is github more likely to go down time then mongo ?)
+
+Also, not mentioning the fact that every request to mongoAtlas slows the response time ( I have a free tier on mongo :/ ).
+
+
+
+A potential solution for the up coming break is to use more cookies again XD

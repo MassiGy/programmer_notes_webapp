@@ -26,12 +26,14 @@ module.exports.render_file_content = (req, res) => {
         */
         let data = {};
 
-
-        const target_gist = res.locals.gists.filter(gist => gist.gist_name == file_name)[0];
-
+        let i = 0;
+        for(i = 0; i < res.locals.gists_names.length; i++){
+            if(res.locals.gists_names[i] == file_name) break;
+        }
+        
         // content should be html, since in ejs it is not escaped.
-        data.content = `<script src="${target_gist.gist_url}.js"></script>`
-        data.title = target_gist.gist_name;
+        data.content = `<script src="https://gist.github.com/MassiGy/${res.locals.gists_ids[i]}.js"></script>`
+        data.title = res.locals.gists_names[i];
 
         return res.render("generic", { data });
     }

@@ -19,8 +19,8 @@
             <% } %>
             
             <% if(mode == "new"){ %>
-                <% for(let gist of gists){ %>
-                <li><a href="/new/files/<%= gist.gist_name %> "><%= gist.gist_name %> </a></li>
+                <% for(let gist_name of gists_names){ %>
+                <li><a href="/new/files/<%= gist_name %> "><%= gist_name %> </a></li>
                 <% } %>
             <% } %>
             

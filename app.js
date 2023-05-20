@@ -10,8 +10,8 @@ const ejs_mate = require('ejs-mate');
 const port = process.env.PORT || 8000;
 const methodOverride = require("method-override");
 const compression = require("compression");
+const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
-const session = require("express-session");
 const axios = require("axios");
 
 
@@ -19,27 +19,6 @@ const axios = require("axios");
 const file_routes = require("./routes/files_routes");
 const cms_routes = require("./routes/cms_routes");
 const other_routes = require("./routes/other_routes");
-
-
-/*
-    the session store is memory based to make the dev faster.
-    This is not a good practice, but since we do not expect a lot of clients it is okey.
-    Also we made the session age relatively small. This will automatically force nodejs to free them
-    when the user access them again.
-
-    I tried to implement file base session storage, but something did not work with the used package.
-    My css did not work anymore when setting up the session file store.
-*/
-
-app.use(session({
-    name: String(process.env.SESSION_NAME),
-    secret: String(process.env.SESSION_SECRET),
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 1 * 60 * 60 * 1000, // recreate every 1 hour, since ressources do not change often
-    }
-}));
 
 
 
@@ -58,7 +37,8 @@ app.use(compression());
 // for security , we've disabled it since it blocks scripts due to Content Security Policy errors.
 // app.use(helmet());
 
-
+// to parse our cookies
+app.use(cookieParser());
 
 
 
@@ -74,66 +54,89 @@ app.use(async (req, res, next) => {
     */
     res.locals.mode = req.originalUrl.split("/")[1];
 
+    // declare our variables
+    let file_names;
+    let gists_names;
+    let gists_ids;
 
-    // only create the session if its not already created or outdated.
-    if (req.session.file_names?.length && req.session.files?.length && req.session.gists?.length) {
-
-        res.locals.files = req.session.files;
-        res.locals.file_names = req.session.file_names;
-
-        res.locals.gists = req.session.gists;
-
-        return next();
+    // declare our cookie options
+    const cookiesOptions = {
+        httpOnly: process.NODE_ENV == "production",
+        maxAge: 3 * 24 * 60 * 60 * 1000
     }
 
 
-    /** Get the local ressources */
-    // find all the file names
-    req.session.file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
-        if (err) res.status(500).send("Ressources can not be found!");
-        return files;
-    });
+    try {
+        // try to get the cookies if any
+        file_names = req.cookies.file_names;
+        gists_names = req.cookies.gists_names;
+        gists_ids = req.cookies.gists_ids;
 
-    // Delete the Guide file to not be rendred twice (look to the view)
-    req.session.file_names.splice(req.session.file_names.indexOf("Guide.txt"), 1);
-    req.session.files = [];
-
-    req.session.file_names.forEach((file) => {
-        req.session.files.push({
-            file_name: file,
-            sample_text: fs.readFileSync(
-                `./controllers/ressources/${file}`,
-                "utf-8",
-                function (err, file_content) {
-                    if (err) return "file content is empty or can not be accessed.";
-                    return file_content;
-                }).toString().substring(0, 70).concat("...")
-        })
-    });
+    } catch (error) {
+        // otherwise, set our variable to null
+        file_names = null;
+        gists_names = null;
+        gists_ids = null;
+    }
 
 
+    // if no file_names in cookie
+    if (!file_names) {
 
-    /** Get my github gists */
-    const response = await axios.get("https://api.github.com/users/MassiGy/gists");
+        // find all the file names
+        file_names = fs.readdirSync("./controllers/ressources", (err, files) => {
+            if (err) res.status(500).send("Ressources can not be found!");
+            return files;
+        });
 
-    req.session.gists = response.data.map(el => {
-        return {
-            gist_url: el.html_url,
-            gist_name: Object.values(el.files)[0].filename,
-        };
-    })
+        // Delete the Guide file to not be rendred twice (look to the view)
+        file_names.splice(file_names.indexOf("Guide.txt"), 1);
+        
+        // add the filename to a cookie to not overload our fs api
+        res.cookie(
+            "file_names",
+            file_names,
+            cookiesOptions
+        );
+
+    }
+
+    // if no gists data
+    if (!gists_names || !gists_ids) {
 
 
+        // get my github gists
+        const response = await axios.get("https://api.github.com/users/MassiGy/gists");
+
+        // get the names
+        gists_names = response.data.map(el => Object.values(el.files)[0].filename);
+        // get the ids
+        gists_ids = response.data.map(el => String(el.html_url).substring(String(el.html_url).lastIndexOf("/") + 1));
+
+        // add the data as cookies to not overload github api
+        res.cookie(
+            "gists_names",
+            gists_names,
+            cookiesOptions
+        );
+        res.cookie(
+            "gists_ids",
+            gists_ids,
+            cookiesOptions
+        );
+
+    }
 
 
+    // add the filenames & the gists data to the locals to have access to them from the views
+    res.locals.gists_names = gists_names;
+    res.locals.gists_ids = gists_ids;
+    res.locals.file_names = file_names;
 
-
-    res.locals.gists = req.session.gists;
-    res.locals.files = req.session.files;
-    res.locals.file_names = req.session.file_names;
-
+    // go to the next middleware.
     return next();
-})
+
+});
 
 
 
