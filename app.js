@@ -12,6 +12,7 @@ const methodOverride = require("method-override");
 const compression = require("compression");
 const helmet = require("helmet");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const axios = require("axios");
 
 
@@ -21,15 +22,6 @@ const cms_routes = require("./routes/cms_routes");
 const other_routes = require("./routes/other_routes");
 
 
-/*
-    the session store is memory based to make the dev faster.
-    This is not a good practice, but since we do not expect a lot of clients it is okey.
-    Also we made the session age relatively small. This will automatically force nodejs to free them
-    when the user access them again.
-
-    I tried to implement file base session storage, but something did not work with the used package.
-    My css did not work anymore when setting up the session file store.
-*/
 
 app.use(session({
     name: String(process.env.SESSION_NAME),
@@ -37,8 +29,14 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1 * 60 * 60 * 1000, // recreate every 1 hour, since ressources do not change often
-    }
+        maxAge: 3 * 24 * 60 * 60 * 1000, 
+        httpOnly: process.NODE_ENV == "production"
+    },
+
+    store: MongoStore.create({
+        mongoUrl: String(process.env.MONGO_ATLAS_URL),
+        touchAfter: 3 * 24 * 60 * 60,
+    })
 }));
 
 

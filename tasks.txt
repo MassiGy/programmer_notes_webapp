@@ -12,7 +12,7 @@ Tasks:
 
 
 
-UPDATE: (May 2023)
+UPDATE: (15 May 2023)
 
 - Replace the middleware that adds the file name to res.locals with a session based storage, to gain performance & also make sure that 
 the session changes only after some age.
@@ -44,3 +44,12 @@ The above script can be also constructed by querying the github api, and then ad
 github gists api: https://api.github.com/users/MassiGy/gists            | replace MassiGy by your username.
 
 html_url: https://gist.github.com/MassiGy/df85af742b60b1f115b08b64fc35e61c
+
+
+UPDATE: (21 May 2023)
+
+Since the last time, the sessions were working fine but the store is not setup (it was memory based). Now I added a 
+mongo atlas based store. It is slower but more scalable. 
+
+This version, this branch, is a backup plan since I also have a cookie based store version on production. The cookie based store
+is not really scalable but it is faster & cheaper. (read the task.txt file on master|dev-massigy-cookies)
