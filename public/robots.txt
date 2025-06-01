@@ -1,2 +1,14 @@
-User-agent: *
-Disallow: /
+User-agent: * 
+Disallow: app.js
+Disallow: /node_modules
+Disallow: /routes
+Disallow: /controllers
+Disallow: package-lock.json
+Disallow: package.json
+Disallow: LICENSE.txt
+Disallow: .env
+Disallow: .gitignore
+Disallow: /assets
+Disallow: /images
+Disallow: /views
+Disallow: *
