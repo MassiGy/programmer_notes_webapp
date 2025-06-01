@@ -28,7 +28,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use("/assets", express.static(__dirname + '/assets'));
 app.use("/images", express.static(__dirname + '/images'));
-app.use("/public", express.static('/public'));
+app.use("/", express.static('/public'));
 // for normal html5 forms
 app.use(express.urlencoded({ extended: true }));
 // for hundling forms with http verbs diffrent then GET | POST.
